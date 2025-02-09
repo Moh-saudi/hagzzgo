@@ -8,6 +8,7 @@ import {
   Activity, FileText, Zap, Brain, Target, Settings, LogOut
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // مكون رسالة الترحيب
 function WelcomePopup({ onClose }: { onClose: () => void }) {
@@ -20,21 +21,20 @@ function WelcomePopup({ onClose }: { onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl p-8 max-w-2xl w-full animate-fade-in">
-        <div className="text-center">
-          <img src="/hagzz-logo.png" alt="HAGZZ GO" className="h-20 mx-auto mb-6" />
-          <h2 className="text-2xl font-bold mb-4">🎉 مرحبًا بك في HAGZZ GO</h2>
-          <p className="text-gray-600 mb-8 leading-relaxed">
-            لنبدأ رحلتك نحو الاحتراف. قم بتخصيص ملفك الشخصي الآن واحصل على أفضل الفرص في عالم كرة القدم!
-          </p>
-          <button
-            onClick={onClose}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700"
-          >
-            ابدأ الآن 🚀
-          </button>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div className="w-full max-w-2xl p-8 bg-white rounded-2xl animate-fade-in">
+        <Image src="/hagzz-logo.png" alt="HAGZZ GO" width={80} height={80} className="h-20 mx-auto mb-6" />
+        <Image src="/hagzz-logo.png" alt="HAGZZ GO" className="h-20 mx-auto mb-6" />
+        <h2 className="mb-4 text-2xl font-bold">🎉 مرحبًا بك في HAGZZ GO</h2>
+        <p className="mb-8 leading-relaxed text-gray-600">
+          لنبدأ رحلتك نحو الاحتراف. قم بتخصيص ملفك الشخصي الآن واحصل على أفضل الفرص في عالم كرة القدم!
+        </p>
+        <button
+          onClick={onClose}
+          className="px-6 py-3 text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700"
+        >
+          ابدأ الآن 🚀
+        </button>
       </div>
     </div>
   );
@@ -181,21 +181,21 @@ export default function PlayerDashboard() {
 
   function StatsCard({ stat }: { stat: Stat }) {
     return (
-      <div className="relative p-6 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 group">
-        <div className="flex justify-between items-start">
+      <div className="relative p-6 transition-all duration-300 bg-white shadow-sm rounded-2xl hover:shadow-lg group">
+        <div className="flex items-start justify-between">
           <div className={`w-12 h-12 rounded-xl ${stat.color} bg-opacity-20 flex items-center justify-center`}>
             {React.createElement(stat.icon as React.ComponentType<any>, { className: `w-6 h-6 ${stat.color.replace('bg-', 'text-')}` })}
           </div>
-          <span className="text-sm px-2 py-1 rounded-full bg-gray-100">{stat.change}</span>
+          <span className="px-2 py-1 text-sm bg-gray-100 rounded-full">{stat.change}</span>
         </div>
         <div className="mt-4">
-          <h3 className="text-gray-600 text-sm">{stat.title}</h3>
+          <h3 className="text-sm text-gray-600">{stat.title}</h3>
           <div className="flex items-baseline gap-2">
             <p className="text-2xl font-bold">{stat.value}</p>
             <span className="text-sm text-gray-500">{stat.subText}</span>
           </div>
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div className="absolute inset-x-0 bottom-0 h-1 transition-opacity opacity-0 bg-gradient-to-r from-transparent via-blue-500 to-transparent group-hover:opacity-100"></div>
       </div>
     );
   }
@@ -213,7 +213,7 @@ export default function PlayerDashboard() {
           <span>{skill.name}</span>
           <span>{skill.value}%</span>
         </div>
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-2 overflow-hidden bg-gray-100 rounded-full">
           <div 
             className={`h-full ${skill.color} rounded-full transition-transform duration-1000`}
             style={{ width: `${skill.value}%`, transform: 'translateX(0)' }}
@@ -257,7 +257,7 @@ export default function PlayerDashboard() {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="text-3xl font-bold text-blue-600">{value}%</span>
-          <span className="text-sm text-gray-500 mt-2">{label}</span>
+          <span className="mt-2 text-sm text-gray-500">{label}</span>
         </div>
       </div>
     );
@@ -270,18 +270,18 @@ export default function PlayerDashboard() {
       {showWelcome && <WelcomePopup onClose={handleCloseWelcome} />}
 
       {/* القائمة الجانبية */}
-      <aside className="fixed right-0 w-80 h-screen bg-white shadow-lg z-20">
-        <div className="p-6 bg-gradient-to-bl from-blue-600 to-blue-800 text-white">
+      <aside className="fixed right-0 z-20 h-screen bg-white shadow-lg w-80">
+        <div className="p-6 text-white bg-gradient-to-bl from-blue-600 to-blue-800">
           <div className="relative w-32 h-32 mx-auto mb-4">
-            <img
+            <Image
               src="/player-avatar.jpg"
               alt="صورة اللاعب"
-              className="rounded-full border-4 border-white shadow-lg w-full h-full object-cover"
+              className="object-cover w-full h-full border-4 border-white rounded-full shadow-lg"
             />
             <span className="absolute bottom-0 left-0 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></span>
           </div>
           <h2 className="text-xl font-bold text-center">أحمد محمد</h2>
-          <p className="text-blue-200 text-center">مهاجم</p>
+          <p className="text-center text-blue-200">مهاجم</p>
         </div>
 
         <nav className="p-4 space-y-2">
@@ -313,29 +313,29 @@ export default function PlayerDashboard() {
       </aside>
 
       {/* المحتوى الرئيسي */}
-      <main className="mr-80 mt-16 p-8">
+      <main className="p-8 mt-16 mr-80">
         {/* الهيدر */}
-        <header className="bg-white rounded-2xl p-6 shadow-sm mb-8">
-          <div className="flex justify-between items-center">
+        <header className="p-6 mb-8 bg-white shadow-sm rounded-2xl">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-l from-blue-600 to-blue-800">
+              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-blue-600 to-blue-800">
                 طريقك نحو العالمية! 🌟
               </h1>
-              <p className="text-gray-600 mt-1">اصنع مستقبلك في عالم كرة القدم</p>
+              <p className="mt-1 text-gray-600">اصنع مستقبلك في عالم كرة القدم</p>
             </div>
             <div className="flex items-center gap-6">
               <div className="relative">
                 <input
                   type="text"
                   placeholder="بحث..."
-                  className="w-64 pr-10 pl-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-64 py-2 pl-4 pr-10 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <Search className="absolute right-3 top-2.5 text-gray-400" />
               </div>
               <div className="flex gap-4">
                 <button className="relative p-2 rounded-lg hover:bg-gray-100">
                   <Bell className="w-6 h-6" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span className="absolute w-2 h-2 bg-red-500 rounded-full -top-1 -right-1"></span>
                 </button>
                 <button className="p-2 rounded-lg hover:bg-gray-100">
                   <Mail className="w-6 h-6" />
@@ -346,16 +346,16 @@ export default function PlayerDashboard() {
         </header>
 
         {/* البطاقات الإحصائية */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 gap-6 mb-8 md:grid-cols-2 lg:grid-cols-4">
           {mockData.stats.map((stat, index) => (
             <StatsCard key={index} stat={stat} />
           ))}
         </div>
 
         {/* المهارات والتقدم */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 gap-8 mb-8 lg:grid-cols-3">
           <Card className="p-6">
-            <h3 className="text-xl font-bold mb-6">المهارات الفنية</h3>
+            <h3 className="mb-6 text-xl font-bold">المهارات الفنية</h3>
             <div className="space-y-6">
               {mockData.skills.technical.map((skill, index) => (
                 <SkillBar key={index} skill={skill} />
@@ -364,7 +364,7 @@ export default function PlayerDashboard() {
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-xl font-bold mb-6">المهارات البدنية</h3>
+            <h3 className="mb-6 text-xl font-bold">المهارات البدنية</h3>
             <div className="space-y-6">
               {mockData.skills.physical.map((skill, index) => (
                 <SkillBar key={index} skill={skill} />
@@ -373,7 +373,7 @@ export default function PlayerDashboard() {
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-xl font-bold mb-6">المهارات النفسية</h3>
+            <h3 className="mb-6 text-xl font-bold">المهارات النفسية</h3>
             <div className="space-y-6">
               {mockData.skills.social.map((skill, index) => (
                 <SkillBar key={index} skill={skill} />
@@ -383,9 +383,9 @@ export default function PlayerDashboard() {
         </div>
 
         {/* الرسائل والتقدم */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <Card className="col-span-2 p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold">آخر الرسائل</h3>
               <Link href="/messages" className="text-blue-600 hover:underline">
                 عرض الكل
@@ -395,16 +395,16 @@ export default function PlayerDashboard() {
               {mockData.messages.map((message) => (
                 <div
                   key={message.id}
-                  className="flex items-center space-x-4 space-x-reverse p-4 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                  className="flex items-center p-4 space-x-4 space-x-reverse transition-colors bg-white rounded-lg hover:bg-gray-50"
                 >
                   <div className="relative">
-                    <img
+                    <Image
                       src={message.avatar}
                       alt={message.sender}
-                      className="w-12 h-12 rounded-full border border-gray-200"
+                      className="w-12 h-12 border border-gray-200 rounded-full"
                     />
                     {message.priority === 'high' && (
-                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                      <span className="absolute w-3 h-3 bg-red-500 border-2 border-white rounded-full -top-1 -right-1"></span>
                     )}
                   </div>
                   <div className="flex-1">
@@ -412,7 +412,7 @@ export default function PlayerDashboard() {
                       <h4 className="font-semibold">{message.sender}</h4>
                       <span className="text-sm text-gray-500">{message.time}</span>
                     </div>
-                    <p className="text-gray-600 text-sm mt-1">{message.content}</p>
+                    <p className="mt-1 text-sm text-gray-600">{message.content}</p>
                   </div>
                 </div>
               ))}
@@ -420,7 +420,7 @@ export default function PlayerDashboard() {
           </Card>
 
           <Card className="p-6">
-            <h3 className="text-xl font-bold mb-6">تقدم الملف الشخصي</h3>
+            <h3 className="mb-6 text-xl font-bold">تقدم الملف الشخصي</h3>
             <div className="flex flex-col items-center">
               <ProgressCircle 
                 value={mockData.personalProgress.total} 
@@ -429,20 +429,20 @@ export default function PlayerDashboard() {
               <div className="w-full mt-6 space-y-4">
                 {Object.entries(mockData.personalProgress.sections).map(([key, value]) => (
                   <div key={key}>
-                    <div className="flex justify-between text-sm mb-1">
+                    <div className="flex justify-between mb-1 text-sm">
                       <span className="text-gray-600">{key}</span>
                       <span>{value}%</span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 overflow-hidden bg-gray-100 rounded-full">
                       <div
-                        className="h-full bg-blue-600 rounded-full transition-transform duration-1000"
+                        className="h-full transition-transform duration-1000 bg-blue-600 rounded-full"
                         style={{ width: `${value}%` }}
                       />
                     </div>
                   </div>
                 ))}
               </div>
-              <button className="mt-6 w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button className="w-full py-2 mt-6 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">
                 تحديث الملف
               </button>
             </div>
@@ -452,42 +452,42 @@ export default function PlayerDashboard() {
         {/* معرض الوسائط */}
         <div className="mt-8">
           <Card className="p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold">معرض الوسائط</h3>
               <button className="text-blue-600 hover:underline">إضافة وسائط</button>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
               {mockData.media.images.map((image, index) => (
-                <div key={index} className="group relative aspect-video rounded-lg overflow-hidden">
-                  <img
+                <div key={index} className="relative overflow-hidden rounded-lg group aspect-video">
+                  <Image
                     src={image.url}
                     alt={image.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-100">
                     <div className="absolute bottom-3 left-3">
-                      <h4 className="text-white font-medium">{image.title}</h4>
-                      <p className="text-gray-300 text-sm">{image.date}</p>
+                      <h4 className="font-medium text-white">{image.title}</h4>
+                      <p className="text-sm text-gray-300">{image.date}</p>
                     </div>
                   </div>
                 </div>
               ))}
               {mockData.media.videos.map((video, index) => (
-                <div key={`video-${index}`} className="group relative aspect-video rounded-lg overflow-hidden">
-                  <img
+                <div key={`video-${index}`} className="relative overflow-hidden rounded-lg group aspect-video">
+                  <Image
                     src={video.thumbnail}
                     alt={video.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/80">
                       <Video className="w-6 h-6 text-blue-600" />
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-100">
                     <div className="absolute bottom-3 left-3">
-                      <h4 className="text-white font-medium">{video.title}</h4>
-                      <p className="text-gray-300 text-sm">{video.duration}</p>
+                      <h4 className="font-medium text-white">{video.title}</h4>
+                      <p className="text-sm text-gray-300">{video.duration}</p>
                     </div>
                   </div>
                 </div>
@@ -498,20 +498,20 @@ export default function PlayerDashboard() {
       </main>
 
       {/* الفوتر */}
-      <footer className="fixed bottom-0 left-0 right-80 bg-white border-t z-30">
-        <div className="container mx-auto px-8 py-6">
-          <div className="flex justify-between items-center">
+      <footer className="fixed bottom-0 left-0 z-30 bg-white border-t right-80">
+        <div className="container px-8 py-6 mx-auto">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <img src="/hagzz-logo.png" alt="HAGZZ GO" className="h-8" />
+              <Image src="/hagzz-logo.png" alt="HAGZZ GO" className="h-8" />
               <p className="text-sm text-gray-600">
                 © 2024 HAGZZ GO جميع الحقوق محفوظة
               </p>
             </div>
             <div className="flex gap-6">
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">عن المنصة</a>
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">الشروط والأحكام</a>
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">سياسة الخصوصية</a>
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">اتصل بنا</a>
+              <a href="#" className="text-gray-600 transition-colors hover:text-blue-600">عن المنصة</a>
+              <a href="#" className="text-gray-600 transition-colors hover:text-blue-600">الشروط والأحكام</a>
+              <a href="#" className="text-gray-600 transition-colors hover:text-blue-600">سياسة الخصوصية</a>
+              <a href="#" className="text-gray-600 transition-colors hover:text-blue-600">اتصل بنا</a>
             </div>
           </div>
         </div>

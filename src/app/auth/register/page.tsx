@@ -125,8 +125,12 @@ export default function RegisterPage() {
       setMessage('تم التسجيل بنجاح! جاري تحويلك...');
       // استخدام router.push بدلاً من window.location
       setTimeout(() => router.push('/auth/login'), 1500);
-    } catch (error: any) {
-      setError(error.message || 'حدث خطأ أثناء التسجيل. حاول مرة أخرى.');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message || 'حدث خطأ أثناء التسجيل. حاول مرة أخرى.');
+      } else {
+        setError('حدث خطأ أثناء التسجيل. حاول مرة أخرى.');
+      }
     } finally {
       setLoading(false);
     }

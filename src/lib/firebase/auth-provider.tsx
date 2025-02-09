@@ -9,7 +9,7 @@ import { createContext, useState, useEffect, useContext, ReactNode } from 'react
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  userData: any | null;
+  userData: unknown| null;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -25,7 +25,7 @@ interface FirebaseAuthProviderProps {
 export const FirebaseAuthProvider: React.FC<FirebaseAuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<any | null>(null);
+  const [userData, setUserData] = useState<unknown| null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
