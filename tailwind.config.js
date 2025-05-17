@@ -6,11 +6,15 @@ module.exports = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+<<<<<<< HEAD
     extend: {
       fontFamily: {
         cairo: ['Cairo', 'sans-serif'],
       },
     },
+=======
+    extend: {},
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
   },
   plugins: [],
 }

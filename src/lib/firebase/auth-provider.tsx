@@ -75,7 +75,11 @@ export const registerUser = async (userData: {
     return userCredential.user;
   } catch (error: any) {
     console.error('خطأ في التسجيل:', error.message);
+<<<<<<< HEAD
     throw new Error(error.message);
+=======
+    throw error;
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
   }
 };
 

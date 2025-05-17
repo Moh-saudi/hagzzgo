@@ -9,8 +9,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+<<<<<<< HEAD
 import { auth, db } from '@/lib/firebase/config';
 import { getDoc, doc } from 'firebase/firestore';
+=======
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
 
 // مكون رسالة الترحيب
 function WelcomePopup({ onClose }: { onClose: () => void }) {
@@ -25,7 +28,12 @@ function WelcomePopup({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="w-full max-w-2xl p-8 bg-white rounded-2xl animate-fade-in">
+<<<<<<< HEAD
         <Image src="/hagzz-logo.png" alt="HAGZZ GO" width={200} height={80} className="h-20 mx-auto mb-6" />
+=======
+        <Image src="/hagzz-logo.png" alt="HAGZZ GO" width={80} height={80} className="h-20 mx-auto mb-6" />
+        <Image src="/hagzz-logo.png" alt="HAGZZ GO" className="h-20 mx-auto mb-6" />
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
         <h2 className="mb-4 text-2xl font-bold">🎉 مرحبًا بك في HAGZZ GO</h2>
         <p className="mb-8 leading-relaxed text-gray-600">
           لنبدأ رحلتك نحو الاحتراف. قم بتخصيص ملفك الشخصي الآن واحصل على أفضل الفرص في عالم كرة القدم!
@@ -43,6 +51,7 @@ function WelcomePopup({ onClose }: { onClose: () => void }) {
 
 export default function PlayerDashboard() {
   const [showWelcome, setShowWelcome] = useState(true);
+<<<<<<< HEAD
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
@@ -63,6 +72,8 @@ export default function PlayerDashboard() {
 
     fetchUserData();
   }, []);
+=======
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
 
   const handleCloseWelcome = () => {
     setShowWelcome(false);
@@ -290,8 +301,56 @@ export default function PlayerDashboard() {
     <div dir="rtl" className="min-h-screen bg-gray-50 font-cairo">
       {showWelcome && <WelcomePopup onClose={handleCloseWelcome} />}
 
+<<<<<<< HEAD
       {/* المحتوى الرئيسي */}
       <main className="p-8">
+=======
+      {/* القائمة الجانبية */}
+      <aside className="fixed right-0 z-20 h-screen bg-white shadow-lg w-80">
+        <div className="p-6 text-white bg-gradient-to-bl from-blue-600 to-blue-800">
+          <div className="relative w-32 h-32 mx-auto mb-4">
+            <Image
+              src="/player-avatar.jpg"
+              alt="صورة اللاعب"
+              className="object-cover w-full h-full border-4 border-white rounded-full shadow-lg"
+            />
+            <span className="absolute bottom-0 left-0 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></span>
+          </div>
+          <h2 className="text-xl font-bold text-center">أحمد محمد</h2>
+          <p className="text-center text-blue-200">مهاجم</p>
+        </div>
+
+        <nav className="p-4 space-y-2">
+        {[
+          { icon: ChartBar, label: 'النظرة العامة', value: 'overview', link: '/dashboard/player' },
+          { icon: User, label: 'الملف الشخصي', value: 'profile', link: '/dashboard/player/profile' },
+          { icon: Activity, label: 'الإحصائيات', value: 'stats', link: '/dashboard/player/stats' },
+          { icon: MessageSquare, label: 'الرسائل', value: 'messages', link: '/dashboard/player/messages' },
+          { icon: FileText, label: 'التقارير', value: 'reports', link: '/dashboard/player/reports' },
+          { icon: Zap, label: 'المهام', value: 'tasks', link: '/dashboard/player/tasks' },
+          { icon: Brain, label: 'التحليلات', value: 'analytics', link: '/dashboard/player/analytics' },
+          { icon: Target, label: 'الأهداف', value: 'objectives', link: '/dashboard/player/objectives' },
+          { icon: Settings, label: 'الإعدادات', value: 'settings', link: '/dashboard/player/settings' },
+          { icon: LogOut, label: 'تسجيل الخروج', value: 'logout', link: '/logout' },
+        ].map((item) => (
+          <Link
+              key={item.value}
+              href={item.link}
+              className={`w-full flex items-center space-x-3 space-x-reverse p-3 rounded-lg transition-colors
+                ${selectedTab === item.value 
+                  ? 'bg-blue-50 text-blue-600' 
+                  : 'hover:bg-gray-50 text-gray-600'}`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </nav>
+      </aside>
+
+      {/* المحتوى الرئيسي */}
+      <main className="p-8 mt-16 mr-80">
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
         {/* الهيدر */}
         <header className="p-6 mb-8 bg-white shadow-sm rounded-2xl">
           <div className="flex items-center justify-between">
@@ -379,8 +438,11 @@ export default function PlayerDashboard() {
                     <Image
                       src={message.avatar}
                       alt={message.sender}
+<<<<<<< HEAD
                       width={48}
                       height={48}
+=======
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                       className="w-12 h-12 border border-gray-200 rounded-full"
                     />
                     {message.priority === 'high' && (
@@ -442,8 +504,11 @@ export default function PlayerDashboard() {
                   <Image
                     src={image.url}
                     alt={image.title}
+<<<<<<< HEAD
                     width={400}
                     height={225}
+=======
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                     className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-100">
@@ -459,8 +524,11 @@ export default function PlayerDashboard() {
                   <Image
                     src={video.thumbnail}
                     alt={video.title}
+<<<<<<< HEAD
                     width={400}
                     height={225}
+=======
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                     className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -482,11 +550,19 @@ export default function PlayerDashboard() {
       </main>
 
       {/* الفوتر */}
+<<<<<<< HEAD
       <footer className="fixed bottom-0 left-0 z-30 bg-white border-t right-0">
         <div className="container px-8 py-6 mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Image src="/hagzz-logo.png" alt="HAGZZ GO" width={32} height={32} className="h-8" />
+=======
+      <footer className="fixed bottom-0 left-0 z-30 bg-white border-t right-80">
+        <div className="container px-8 py-6 mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Image src="/hagzz-logo.png" alt="HAGZZ GO" className="h-8" />
+>>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <p className="text-sm text-gray-600">
                 © 2024 HAGZZ GO جميع الحقوق محفوظة
               </p>
