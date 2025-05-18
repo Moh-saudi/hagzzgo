@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth, db } from "@/lib/firebase/config";   // تأكد من صحة هذا المسار
+import { db, auth } from '@/src/lib/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function DashboardRedirectPage() {

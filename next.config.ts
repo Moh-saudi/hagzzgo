@@ -18,6 +18,13 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true, // ✅ تعطيل فحص TypeScript أثناء البناء
   },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': __dirname
+    };
+    return config;
+  }
 };
 
 export default nextConfig;

@@ -3,9 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
+import { db, auth } from '@/src/lib/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase/config';
 import { Calendar, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface SubscriptionStatus {
@@ -259,4 +258,4 @@ export default function SubscriptionStatusPage() {
       </div>
     </div>
   );
-} 
+}
