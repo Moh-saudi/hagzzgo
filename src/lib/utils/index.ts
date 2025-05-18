@@ -1,8 +1,8 @@
 // src/lib/utils/index.ts
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-export { uploadFileToAzure } from "./upload";
-
+// تم تعطيل Azure مؤقتاً
+// export { uploadFileToAzure } from "./upload";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -21,4 +21,24 @@ export const formatDate = (date: Date) => {
     month: "long",
     year: "numeric",
   }).format(date)
+}
+
+// إضافة دالة رفع الملفات باستخدام Supabase
+export const uploadFileToStorage = async (file: File, bucket: string) => {
+  try {
+    const { supabase } = await import('@/lib/supabase/config')
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Math.random()}.${fileExt}`
+
+    const { data, error } = await supabase
+      .storage
+      .from(bucket)
+      .upload(fileName, file)
+
+    if (error) throw error
+    return data.path
+  } catch (error) {
+    console.error('خطأ في رفع الملف:', error)
+    throw error
+  }
 }
