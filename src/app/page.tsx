@@ -2,10 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Menu, X, ChevronRight, Star, MapPin, Mail, Phone, ChevronLeft, Brain, Trophy, Network, Globe } from 'lucide-react';
-<<<<<<< HEAD
 import Image from 'next/image';
-=======
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
 
 export default function Page() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,34 +14,18 @@ export default function Page() {
     clubs: 0
   });
 
-  // Hero Slider Data
-  const heroSlides = [
+  const slides = [
     {
       title: "حول موهبتك إلى احتراف عالمي",
       subtitle: "نستخدم الذكاء الاصطناعي لتحليل أدائك وربطك بأفضل الأندية العالمية",
-<<<<<<< HEAD
       image: "/slider/1.png",
-=======
-      image: "/api/placeholder/1920/1080",
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
       gradient: "from-blue-900/90 to-blue-600/90"
     },
     {
       title: "فرص احترافية حقيقية",
       subtitle: "نوفر لك فرص الانضمام لأكبر الأندية في أوروبا والوطن العربي",
-<<<<<<< HEAD
       image: "/slider/2.png",
       gradient: "from-green-900/90 to-green-600/90"
-    },
-    {
-      title: "عنوان ثالث للسلايدر",
-      subtitle: "نص توضيحي للسلايدر الثالث",
-      image: "/slider/3.png",
-      gradient: "from-purple-900/90 to-purple-600/90"
-=======
-      image: "/api/placeholder/1920/1080",
-      gradient: "from-green-900/90 to-green-600/90"
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
     }
   ];
 
@@ -92,7 +73,7 @@ export default function Page() {
   useEffect(() => {
     // Auto slide changer
     const slideInterval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % heroSlides.length);
+      setActiveSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
 
     // Stats counter animation
@@ -114,7 +95,6 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50" dir="rtl">
       {/* Header */}
-<<<<<<< HEAD
       <header className="fixed z-50 w-full shadow-lg bg-white/90 backdrop-blur-sm">
         <nav className="container px-4 py-4 mx-auto">
           <div className="flex items-center justify-between">
@@ -146,27 +126,6 @@ export default function Page() {
                   ابدأ رحلتك الآن
                 </button>
               </div>
-=======
-      <header className="fixed w-full bg-white/90 backdrop-blur-sm shadow-lg z-50">
-        <nav className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-              Hagzz Go
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-              <a href="#services" className="hover:text-blue-600 transition-colors">خدماتنا</a>
-              <a href="#packages" className="hover:text-blue-600 transition-colors">الباقات</a>
-              <a href="#careers" className="hover:text-blue-600 transition-colors">الوظائف</a>
-              <a href="#contact" className="hover:text-blue-600 transition-colors">اتصل بنا</a>
-              <button 
-                onClick={() => window.location.href = '/auth/login'}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all"
-              >
-                تسجيل الدخول
-              </button>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
             </div>
 
             {/* Mobile Menu Button */}
@@ -177,16 +136,11 @@ export default function Page() {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-<<<<<<< HEAD
             <div className="pt-4 pb-2 md:hidden">
-=======
-            <div className="md:hidden pt-4 pb-2">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <a href="#services" className="block py-2">خدماتنا</a>
               <a href="#packages" className="block py-2">الباقات</a>
               <a href="#careers" className="block py-2">الوظائف</a>
               <a href="#contact" className="block py-2">اتصل بنا</a>
-<<<<<<< HEAD
               <div className="flex gap-2 mt-2">
                 <button 
                   onClick={() => window.location.href = '/auth/login'}
@@ -201,14 +155,6 @@ export default function Page() {
                   ابدأ رحلتك الآن
                 </button>
               </div>
-=======
-              <button 
-                onClick={() => window.location.href = '/auth/login'}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg mt-2"
-              >
-                تسجيل الدخول
-              </button>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
             </div>
           )}
         </nav>
@@ -216,8 +162,7 @@ export default function Page() {
 
       {/* Hero Section */}
       <section className="relative h-screen">
-<<<<<<< HEAD
-        {heroSlides.map((slide, idx) => (
+        {slides.map((slide, idx) => (
           <div
             key={idx}
             className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -234,22 +179,6 @@ export default function Page() {
             <div className="absolute inset-0 flex items-center justify-center text-center text-white">
               <div className="container px-4 mx-auto">
                 {/* تم حذف زر التسجيل من السلايدر */}
-=======
-        {heroSlides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              activeSlide === index ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover"
-            />
-            <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`} />
-            <div className="absolute inset-0 flex items-center justify-center text-white text-center">
-              <div className="container mx-auto px-4">
                 <h1 className="text-5xl md:text-7xl font-bold mb-6">{slide.title}</h1>
                 <p className="text-xl md:text-2xl mb-8">{slide.subtitle}</p>
                 <button 
@@ -258,7 +187,6 @@ export default function Page() {
                 >
                   ابدأ رحلتك الآن
                 </button>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               </div>
             </div>
           </div>
@@ -267,50 +195,28 @@ export default function Page() {
 
       {/* Stats Section */}
       <section className="py-16 bg-white">
-<<<<<<< HEAD
         <div className="container px-4 mx-auto">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             <div className="p-6 text-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
               <div className="mb-2 text-4xl font-bold text-blue-600">
-=======
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-2xl text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 {stats.visitors.toLocaleString()}+
               </div>
               <div className="text-gray-600">زائر شهريا</div>
             </div>
-<<<<<<< HEAD
             <div className="p-6 text-center bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
               <div className="mb-2 text-4xl font-bold text-green-600">
-=======
-            <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-2xl text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 {stats.deals.toLocaleString()}+
               </div>
               <div className="text-gray-600">صفقة ناجحة</div>
             </div>
-<<<<<<< HEAD
             <div className="p-6 text-center bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl">
               <div className="mb-2 text-4xl font-bold text-amber-600">
-=======
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-2xl text-center">
-              <div className="text-4xl font-bold text-amber-600 mb-2">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 {stats.players.toLocaleString()}+
               </div>
               <div className="text-gray-600">لاعب محترف</div>
             </div>
-<<<<<<< HEAD
             <div className="p-6 text-center bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl">
               <div className="mb-2 text-4xl font-bold text-purple-600">
-=======
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-2xl text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 {stats.clubs.toLocaleString()}+
               </div>
               <div className="text-gray-600">نادي شريك</div>
@@ -321,19 +227,11 @@ export default function Page() {
 
       {/* Packages Section */}
       <section id="packages" className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-<<<<<<< HEAD
         <div className="container px-4 mx-auto">
           <h2 className="mb-4 text-4xl font-bold text-center">باقات الاشتراك</h2>
           <p className="mb-12 text-xl text-center text-gray-600">اختر الباقة المناسبة وابدأ رحلة احترافك</p>
           
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-=======
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-4">باقات الاشتراك</h2>
-          <p className="text-xl text-gray-600 text-center mb-12">اختر الباقة المناسبة وابدأ رحلة احترافك</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
             {packages.map((pkg, index) => (
               <div
                 key={index}
@@ -342,7 +240,6 @@ export default function Page() {
                 }`}
               >
                 {pkg.isPopular && (
-<<<<<<< HEAD
                   <div className="px-4 py-2 mb-4 text-sm text-center text-white bg-blue-500 rounded-full">
                     الأكثر طلباً
                   </div>
@@ -359,36 +256,13 @@ export default function Page() {
                   {pkg.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center text-gray-600">
                       <ChevronRight className="ml-2 text-green-500" />
-=======
-                  <div className="bg-blue-500 text-white text-center py-2 px-4 rounded-full text-sm mb-4">
-                    الأكثر طلباً
-                  </div>
-                )}
-                <h3 className="text-2xl font-bold text-center mb-4">{pkg.title}</h3>
-                <div className="text-center mb-6">
-                  <span className="text-4xl font-bold text-blue-600">${pkg.price}</span>
-                  <span className="text-gray-400 line-through mr-2">${pkg.originalPrice}</span>
-                  <span className="bg-green-100 text-green-600 text-sm px-2 py-1 rounded-full mr-2">
-                    خصم {pkg.discount}
-                  </span>
-                </div>
-                <ul className="space-y-4 mb-8">
-                  {pkg.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center text-gray-600">
-                      <ChevronRight className="text-green-500 ml-2" />
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                       {feature}
                     </li>
                   ))}
                 </ul>
                 <button 
-<<<<<<< HEAD
                   onClick={() => window.location.href = '/auth/register'}
                   className="w-full py-3 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
-=======
-                  onClick={() => window.location.href = `/dashboard/payment?plan=${pkg.title}&price=${pkg.price}`}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 >
                   اشترك الآن
                 </button>
@@ -400,76 +274,46 @@ export default function Page() {
 
       {/* Services Section */}
       <section id="services" className="py-16 bg-white">
-<<<<<<< HEAD
         <div className="container px-4 mx-auto">
           <h2 className="mb-4 text-3xl font-bold text-center">خدماتنا</h2>
           <p className="mb-12 text-center text-gray-600">نقدم لك خدمات مميزة تساعدك على تحقيق أحلامك</p>
           <div className="grid gap-8 md:grid-cols-2">
             <div className="p-6 transition-all duration-300 transform shadow-md group bg-gray-50 rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">خدماتنا</h2>
-          <p className="text-gray-600 text-center mb-12">نقدم لك خدمات مميزة تساعدك على تحقيق أحلامك</p>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="group bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
                   تحليل الأداء
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">نقدم لك تحليل دقيق لأدائك ونساعدك على تحسين نقاط الضعف</p>
-=======
-              <p className="text-gray-600 mb-4">نقدم لك تحليل دقيق لأدائك ونساعدك على تحسين نقاط الضعف</p>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:scale-[1.02]">
                 اعرف المزيد
               </button>
             </div>
-<<<<<<< HEAD
             <div className="p-6 transition-all duration-300 transform shadow-md group bg-gray-50 rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-            <div className="group bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
                   العروض الاحترافية
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">نقدم لك عروض احترافية للأندية العالمية والمحلية</p>
             </div> <div className="p-6 transition-all duration-300 transform shadow-md group bg-gray-50 rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-              <p className="text-gray-600 mb-4">نقدم لك عروض احترافية للأندية العالمية والمحلية</p>
-            </div> <div className="group bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
                   المعايشات الدولية والمحلية
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">نقدم لك عروض معايشات للأندية العالمية والمحلية في دول  قطر والامارات  والجزائر والسعودية</p>
             </div> <div className="p-6 transition-all duration-300 transform shadow-md group bg-gray-50 rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-              <p className="text-gray-600 mb-4">نقدم لك عروض معايشات للأندية العالمية والمحلية في دول  قطر والامارات  والجزائر والسعودية</p>
-            </div> <div className="group bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
                   تسويق اللاعبين
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">بناء جسور مع الاندية والوكلاء الرياضيين من كل دول العالم </p>
-=======
-              <p className="text-gray-600 mb-4">بناء جسور مع الاندية والوكلاء الرياضيين من كل دول العالم </p>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
             </div>
           </div>
         </div>
@@ -477,108 +321,64 @@ export default function Page() {
 
       {/* Careers Section */}
       <section id="careers" className="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
-<<<<<<< HEAD
         <div className="container px-4 mx-auto">
           <h2 className="mb-4 text-3xl font-bold text-center">الوظائف</h2>
           <p className="mb-12 text-center text-gray-600">انضم إلى فريقنا المتميز وساهم في تحقيق أحلام الشباب</p>
           <div className="grid gap-8 md:grid-cols-2">
             <div className="p-6 transition-all duration-300 transform bg-white shadow-md group rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">الوظائف</h2>
-          <p className="text-gray-600 text-center mb-12">انضم إلى فريقنا المتميز وساهم في تحقيق أحلام الشباب</p>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
                   محلل الأداء
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">نبحث عن محللين متخصصين في تحليل الأداء وتقديم النصائح</p>
-=======
-              <p className="text-gray-600 mb-4">نبحث عن محللين متخصصين في تحليل الأداء وتقديم النصائح</p>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:scale-[1.02]">
                 اتصل بنا
               </button>
             </div>
-<<<<<<< HEAD
             <div className="p-6 transition-all duration-300 transform bg-white shadow-md group rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-            <div className="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
                   قسم العروض
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">نبحث عن مديرين اشخاص لديهم مهارات التفاوض وعداد العروض الرياضية والتعاقدات للعمل في فرع في مصر </p>
               <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:scale-[1.02]">
                 اتصل بنا
               </button>
             </div>  <div className="p-6 transition-all duration-300 transform bg-white shadow-md group rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-              <p className="text-gray-600 mb-4">نبحث عن مديرين اشخاص لديهم مهارات التفاوض وعداد العروض الرياضية والتعاقدات للعمل في فرع في مصر </p>
-              <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:scale-[1.02]">
-                اتصل بنا
-              </button>
-            </div>  <div className="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
-                    قسم التسويق  
+                  قسم التسويق  
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">نبحث عن مديير لقسم التسويق والشركات الاستراتيجية </p>
               <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:scale-[1.02]">
                 اتصل بنا
               </button>
             </div>  <div className="p-6 transition-all duration-300 transform bg-white shadow-md group rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-              <p className="text-gray-600 mb-4">نبحث عن مديير لقسم التسويق والشركات الاستراتيجية </p>
-              <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:scale-[1.02]">
-                اتصل بنا
-              </button>
-            </div>  <div className="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
                 قسم العلاقات الدولية  
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">نبحث عن مسئول العلاقات الدولية بالسعودية  والامارات وقطر</p>
-=======
-              <p className="text-gray-600 mb-4">نبحث عن مسئول العلاقات الدولية بالسعودية  والامارات وقطر</p>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:scale-[1.02]">
                 اتصل بنا
               </button>
             </div>
-<<<<<<< HEAD
             <div className="p-6 transition-all duration-300 transform bg-white shadow-md group rounded-xl hover:shadow-xl hover:-translate-y-1">
-=======
-            <div className="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-500">
                    قسم المعايشات  
                 </h3>
                 <Star className="text-yellow-500" />
               </div>
-<<<<<<< HEAD
               <p className="mb-4 text-gray-600">نبحث عن رئيس قسم للمعايشات المحلية في قطر ومصر والسعودية والامارات </p>
-=======
-              <p className="text-gray-600 mb-4">نبحث عن رئيس قسم للمعايشات المحلية في قطر ومصر والسعودية والامارات </p>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-2 rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:scale-[1.02]">
                 اتصل بنا
               </button>
@@ -589,7 +389,6 @@ export default function Page() {
       </section>
 
       {/* Footer */}
-<<<<<<< HEAD
       <footer id="contact" className="py-16 text-white bg-gray-900">
         <div className="container px-4 mx-auto">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
@@ -616,40 +415,11 @@ export default function Page() {
                     hazz@mesk.qa
                   </a>
                 </li>
-=======
-      <footer id="contact" className="bg-gray-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Left column */}
-            <div>
-              <h3 className="text-2xl font-bold mb-4">تواصل معنا</h3>
-              <p className="text-gray-400 mb-4">نحن هنا لمساعدتك في تحقيق أحلامك</p>
-              <ul className="space-y-2">
-                <li className="flex items-center">
-                  <Mail className="text-gray-400 mr-2" />
-                  <a href="mailto:info@example.com" className="text-gray-400 hover:text-white transition-colors">
-                    info@example.com
-                  </a>
-                </li>
-                <li className="flex items-center">
-                  <Phone className="text-gray-400 mr-2" />
-                  <a href="tel:+1234567890" className="text-gray-400 hover:text-white transition-colors">
-                    +1234567890
-                  </a>
-                </li>
-                <li className="flex items-center">
-                  <MapPin className="text-gray-400 mr-2" />
-                  <span className="text-gray-400"> 60 westbay, omer st, Doha, Qatar</span>
-                  <span className="text-gray-400"> 155 abbas elakad St, Cairo, Egypt</span>
-                  <span className="text-gray-400"> 768, khalifa St, Dubai, UHA</span>
-                </li>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               </ul>
             </div>
             
             {/* Right column */}
             <div>
-<<<<<<< HEAD
               <h3 className="mb-4 text-2xl font-bold">تابعنا</h3>
               <p className="mb-4 text-gray-400">
                 تابعنا على وسائل التواصل الاجتماعي للبقاء على اطلاع بآخر الأخبار والعروض
@@ -666,24 +436,6 @@ export default function Page() {
                 </a>
                 <a href="#" className="text-gray-400 transition-colors hover:text-white" aria-label="لينكدإن">
                   <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.5 11.268h-3v-5.604c0-1.337-.025-3.063-1.868-3.063-1.868 0-2.154 1.459-2.154 2.967v5.7h-3v-10h2.881v1.367h.041c.401-.761 1.381-1.563 2.841-1.563 3.039 0 3.6 2.001 3.6 4.599v5.597z"/></svg>
-=======
-              <h3 className="text-2xl font-bold mb-4">تابعنا</h3>
-              <p className="text-gray-400 mb-4">
-                تابعنا على وسائل التواصل الاجتماعي للبقاء على اطلاع بآخر الأخبار والعروض
-              </p>
-              <div className="flex space-x-4 space-x-reverse">
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Brain size={24} />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Trophy size={24} />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Network size={24} />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Globe size={24} />
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 </a>
               </div>
             </div>
