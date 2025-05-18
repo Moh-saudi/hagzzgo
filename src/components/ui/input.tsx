@@ -1,11 +1,15 @@
 import * as React from "react"
-import { cn } from "@/lib/utils"
- 
+import { clsx } from 'clsx'
+
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}
- 
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {
+    const cn = (...inputs: (string | undefined)[]) => {
+      return clsx(inputs)
+    }
+
     return (
       <input
         type={type}
@@ -20,5 +24,5 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   }
 )
 Input.displayName = "Input"
- 
+
 export { Input }

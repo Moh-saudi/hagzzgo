@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { db, auth } from '@/src/lib/firebase/config';
+import { db, auth } from '@/lib/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function DashboardRedirectPage() {

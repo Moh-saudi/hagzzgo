@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { doc, getDoc } from 'firebase/firestore';
-import { db, auth } from '@/src/lib/firebase/config';
+import { db, auth } from '@/lib/firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ar';
 import {

@@ -1,5 +1,4 @@
 // src/lib/utils/file.ts
-import { uploadFileToAzure } from '../azure/config';
 
 export const allowedFileTypes = {
   images: ['image/jpeg', 'image/png', 'image/webp'],

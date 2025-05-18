@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
-import { db, auth } from '@/src/lib/firebase/config';
+import { db, auth } from '@/lib/firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Calendar, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 
