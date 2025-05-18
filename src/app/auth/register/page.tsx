@@ -123,22 +123,10 @@ export default function RegisterPage() {
     try {
       await registerUser(formData);
       setMessage('تم التسجيل بنجاح! جاري تحويلك...');
-<<<<<<< HEAD
-      setTimeout(() => router.push('/auth/login'), 1500);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        if (error.message.includes('auth/email-already-in-use')) {
-          setError('البريد الإلكتروني مستخدم بالفعل. يرجى استخدام بريد إلكتروني آخر أو تسجيل الدخول.');
-        } else {
-          setError(error.message || 'حدث خطأ أثناء التسجيل. حاول مرة أخرى.');
-        }
-=======
-      // استخدام router.push بدلاً من window.location
       setTimeout(() => router.push('/auth/login'), 1500);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message || 'حدث خطأ أثناء التسجيل. حاول مرة أخرى.');
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
       } else {
         setError('حدث خطأ أثناء التسجيل. حاول مرة أخرى.');
       }
@@ -148,22 +136,6 @@ export default function RegisterPage() {
   };
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-blue-600 to-purple-700" dir="rtl">
-<<<<<<< HEAD
-      <div className="w-full max-w-md overflow-hidden bg-white shadow-2xl rounded-xl">
-        {/* Header Section */}
-        <div className="p-6 text-center text-white bg-gradient-to-r from-blue-500 to-purple-600">
-          <div className="flex justify-center mb-4">
-            <Shield className="w-10 h-10" />
-          </div>
-          <h1 className="mb-2 text-2xl font-bold">إنشاء حساب جديد</h1>
-          <p className="text-base text-blue-100">انضم إلى مجتمعنا الرياضي</p>
-        </div>
-
-        <form onSubmit={handleRegister} className="p-5 space-y-5">
-          {/* Error and Success Messages */}
-          {error && (
-            <div className="flex items-center gap-2 p-3 text-base text-red-700 rounded-lg bg-red-50">
-=======
       <div className="w-full max-w-xl overflow-hidden bg-white shadow-2xl rounded-xl">
         {/* Header Section */}
         <div className="p-6 text-center text-white bg-gradient-to-r from-blue-500 to-purple-600">
@@ -178,31 +150,18 @@ export default function RegisterPage() {
           {/* Error and Success Messages */}
           {error && (
             <div className="flex items-center gap-2 p-4 text-red-700 rounded-lg bg-red-50">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <AlertTriangle className="w-5 h-5" />
               <p>{error}</p>
             </div>
           )}
           {message && (
-<<<<<<< HEAD
-            <div className="flex items-center gap-2 p-3 text-base text-green-700 rounded-lg bg-green-50">
-=======
             <div className="flex items-center gap-2 p-4 text-green-700 rounded-lg bg-green-50">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <CheckCircle className="w-5 h-5" />
               <p>{message}</p>
             </div>
           )}
 
           {/* Account Type Selection */}
-<<<<<<< HEAD
-          <div className="grid grid-cols-2 gap-3">
-            {accountTypes.map(({ value, label, icon: Icon }) => (
-              <label
-                key={value}
-                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer border-2 transition-all text-base
-                  ${formData.accountType === value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-200'}`}
-=======
           <div className="grid grid-cols-2 gap-4">
             {accountTypes.map(({ value, label, icon: Icon }) => (
               <label
@@ -212,7 +171,6 @@ export default function RegisterPage() {
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-blue-200'
                 }`}
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               >
                 <input
                   type="radio"
@@ -232,88 +190,52 @@ export default function RegisterPage() {
           <div className="space-y-4">
             {/* Full Name Input */}
             <div>
-<<<<<<< HEAD
-              <label className="block mb-2 text-base text-gray-700">الاسم الكامل</label>
-=======
               <label className="block mb-2 text-gray-700">الاسم الكامل</label>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="relative">
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-<<<<<<< HEAD
-                  className="w-full py-3 px-4 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="أدخل الاسم الكامل"
-                  required
-=======
                   className="w-full py-3 pl-4 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="أدخل اسمك الكامل"
                   required
                   maxLength={50}
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 />
                 <User className="absolute w-5 h-5 text-gray-400 -translate-y-1/2 right-3 top-1/2" />
               </div>
             </div>
-<<<<<<< HEAD
             {/* Phone Input */}
             <div>
-              <label className="block mb-2 text-base text-gray-700">رقم الهاتف</label>
-=======
-
-            {/* Phone Number Input */}
-            <div>
               <label className="block mb-2 text-gray-700">رقم الهاتف</label>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="relative">
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-<<<<<<< HEAD
-                  className="w-full py-3 px-4 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="أدخل رقم الهاتف"
-                  required
-=======
                   className="w-full py-3 pl-4 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="أدخل رقم الهاتف"
                   required
                   maxLength={10}
                   pattern="[0-9]{10}"
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 />
                 <Phone className="absolute w-5 h-5 text-gray-400 -translate-y-1/2 right-3 top-1/2" />
               </div>
             </div>
-<<<<<<< HEAD
-            {/* Password Input */}
-            <div>
-              <label className="block mb-2 text-base text-gray-700">كلمة المرور</label>
-=======
-
             {/* Password Input */}
             <div>
               <label className="block mb-2 text-gray-700">كلمة المرور</label>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-<<<<<<< HEAD
-                  className="w-full py-3 pl-12 pr-4 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="أدخل كلمة المرور"
-                  required
-=======
                   className="w-full py-3 pl-12 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="8 أحرف على الأقل"
                   required
                   minLength={8}
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                 />
                 <Lock className="absolute w-5 h-5 text-gray-400 -translate-y-1/2 right-3 top-1/2" />
                 <button
@@ -325,32 +247,20 @@ export default function RegisterPage() {
                 </button>
               </div>
             </div>
-<<<<<<< HEAD
-            {/* Confirm Password Input */}
-            <div>
-              <label className="block mb-2 text-base text-gray-700">تأكيد كلمة المرور</label>
-=======
-
             {/* Confirm Password Input */}
             <div>
               <label className="block mb-2 text-gray-700">تأكيد كلمة المرور</label>
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-<<<<<<< HEAD
-                  className="w-full py-3 pl-12 pr-4 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-=======
                   className="w-full py-3 pl-12 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                   placeholder="أعد إدخال كلمة المرور"
                   required
                 />
                 <Lock className="absolute w-5 h-5 text-gray-400 -translate-y-1/2 right-3 top-1/2" />
-<<<<<<< HEAD
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -381,49 +291,11 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-lg text-white font-bold text-lg transition-all flex items-center justify-center gap-2
-              ${
-                loading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
-              }`}
-=======
-              </div>
-            </div>
-
-            {/* Terms and Conditions Checkbox */}
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="agreeToTerms"
-                checked={formData.agreeToTerms}
-                onChange={handleInputChange}
-                className="w-4 h-4 text-blue-600"
-                required
-              />
-              <label className="text-sm text-gray-600">
-                أوافق على{" "}
-                <button
-                  type="button"
-                  onClick={() => setShowTerms(true)}
-                  className="text-blue-600 hover:underline"
-                >
-                  الشروط والأحكام وسياسة الخصوصية
-                </button>
-              </label>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
             className={`w-full py-4 rounded-lg text-white font-bold text-lg transition-all flex items-center justify-center gap-2 ${
               loading
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
             }`}
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
           >
             {loading ? (
               <>
@@ -431,13 +303,6 @@ export default function RegisterPage() {
                 جاري التسجيل...
               </>
             ) : (
-<<<<<<< HEAD
-              'إنشاء حساب'
-            )}
-          </button>
-
-          <div className="text-center text-base text-gray-600">
-=======
               <>
                 <UserCheck className="w-5 h-5" />
                 إنشاء حساب جديد
@@ -447,7 +312,6 @@ export default function RegisterPage() {
 
           {/* Login Link */}
           <div className="text-center text-gray-600">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
             لديك حساب بالفعل؟{' '}
             <button
               type="button"

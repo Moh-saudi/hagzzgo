@@ -3,17 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { 
-  Bell, Mail, Search, User, ChartBar, Eye, 
-  MessageSquare, Heart, UserCheck, Video, 
-  Activity, FileText, Zap, Brain, Target, Settings, LogOut
+  AlertCircle, Award, Badge, BookOpen 
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-<<<<<<< HEAD
 import { auth, db } from '@/lib/firebase/config';
 import { getDoc, doc } from 'firebase/firestore';
-=======
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
 
 // مكون رسالة الترحيب
 function WelcomePopup({ onClose }: { onClose: () => void }) {
@@ -28,12 +23,8 @@ function WelcomePopup({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="w-full max-w-2xl p-8 bg-white rounded-2xl animate-fade-in">
-<<<<<<< HEAD
-        <Image src="/hagzz-logo.png" alt="HAGZZ GO" width={200} height={80} className="h-20 mx-auto mb-6" />
-=======
         <Image src="/hagzz-logo.png" alt="HAGZZ GO" width={80} height={80} className="h-20 mx-auto mb-6" />
         <Image src="/hagzz-logo.png" alt="HAGZZ GO" className="h-20 mx-auto mb-6" />
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
         <h2 className="mb-4 text-2xl font-bold">🎉 مرحبًا بك في HAGZZ GO</h2>
         <p className="mb-8 leading-relaxed text-gray-600">
           لنبدأ رحلتك نحو الاحتراف. قم بتخصيص ملفك الشخصي الآن واحصل على أفضل الفرص في عالم كرة القدم!
@@ -51,7 +42,6 @@ function WelcomePopup({ onClose }: { onClose: () => void }) {
 
 export default function PlayerDashboard() {
   const [showWelcome, setShowWelcome] = useState(true);
-<<<<<<< HEAD
   const [userData, setUserData] = useState(null);
 
   useEffect(() => {
@@ -72,8 +62,6 @@ export default function PlayerDashboard() {
 
     fetchUserData();
   }, []);
-=======
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
 
   const handleCloseWelcome = () => {
     setShowWelcome(false);
@@ -301,10 +289,6 @@ export default function PlayerDashboard() {
     <div dir="rtl" className="min-h-screen bg-gray-50 font-cairo">
       {showWelcome && <WelcomePopup onClose={handleCloseWelcome} />}
 
-<<<<<<< HEAD
-      {/* المحتوى الرئيسي */}
-      <main className="p-8">
-=======
       {/* القائمة الجانبية */}
       <aside className="fixed right-0 z-20 h-screen bg-white shadow-lg w-80">
         <div className="p-6 text-white bg-gradient-to-bl from-blue-600 to-blue-800">
@@ -350,7 +334,6 @@ export default function PlayerDashboard() {
 
       {/* المحتوى الرئيسي */}
       <main className="p-8 mt-16 mr-80">
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
         {/* الهيدر */}
         <header className="p-6 mb-8 bg-white shadow-sm rounded-2xl">
           <div className="flex items-center justify-between">
@@ -438,11 +421,8 @@ export default function PlayerDashboard() {
                     <Image
                       src={message.avatar}
                       alt={message.sender}
-<<<<<<< HEAD
                       width={48}
                       height={48}
-=======
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                       className="w-12 h-12 border border-gray-200 rounded-full"
                     />
                     {message.priority === 'high' && (
@@ -504,11 +484,8 @@ export default function PlayerDashboard() {
                   <Image
                     src={image.url}
                     alt={image.title}
-<<<<<<< HEAD
                     width={400}
                     height={225}
-=======
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                     className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-t from-black/60 to-transparent group-hover:opacity-100">
@@ -524,11 +501,8 @@ export default function PlayerDashboard() {
                   <Image
                     src={video.thumbnail}
                     alt={video.title}
-<<<<<<< HEAD
                     width={400}
                     height={225}
-=======
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
                     className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -550,19 +524,11 @@ export default function PlayerDashboard() {
       </main>
 
       {/* الفوتر */}
-<<<<<<< HEAD
-      <footer className="fixed bottom-0 left-0 z-30 bg-white border-t right-0">
-        <div className="container px-8 py-6 mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Image src="/hagzz-logo.png" alt="HAGZZ GO" width={32} height={32} className="h-8" />
-=======
       <footer className="fixed bottom-0 left-0 z-30 bg-white border-t right-80">
         <div className="container px-8 py-6 mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Image src="/hagzz-logo.png" alt="HAGZZ GO" className="h-8" />
->>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
               <p className="text-sm text-gray-600">
                 © 2024 HAGZZ GO جميع الحقوق محفوظة
               </p>
