@@ -303,328 +303,189 @@ const formatDate = (dateValue: Date | string | { toDate: () => Date } | null | u
   }
 };
 
-export default function PlayerProfile() {
-  const router = useRouter();
-  const [user, loading, error] = useAuthState(auth);
-  const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL);
-  const [submitting, setSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [formErrors, setFormErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [playerData, setPlayerData] = useState<PlayerState | null>(null);
-  const [formData, setFormData] = useState<PlayerState>(defaultPlayerFields);
-  const [editFormData, setEditFormData] = useState<PlayerState>(defaultPlayerFields);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editError, setEditError] = useState('');
-  const [editLoading, setEditLoading] = useState(false);
-  const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
-  const [uploadingAdditionalImages, setUploadingAdditionalImages] = useState({});
+// Add these interfaces near the top of your file
+interface FileUploadOptions {
+  upsert?: boolean;
+  cacheControl?: string;
+  contentType?: string;
+}
 
-  // Debug logging for auth state
-  useEffect(() => {
-    console.log('Auth State:', { user, loading, error });
-  }, [user, loading, error]);
-
-  // Handle auth errors
-  useEffect(() => {
-    if (error) {
-      console.error('Auth error:', error);
-      setFormErrors(prev => ({
-        ...prev,
-        auth: 'حدث خطأ في المصادقة'
-      }));
-    }
-  }, [error]);
-
-  // Handle user authentication
-  useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        console.log('No user found, redirecting to login');
-        router.push('/login');
-      } else {
-        console.log('User authenticated:', user.uid);
-      }
-    }
-  }, [loading, user, router]);
-
-  // Fetch player data
-  const fetchPlayerData = useCallback(async () => {
-    if (!user) {
-      console.log("No user found");
-      return;
+// Update the file upload functions with proper type annotations
+const uploadProfileImage = async (
+  file: File,
+  userId: string
+): Promise<string> => {
+  try {
+    // Check authentication first
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      throw new Error('يجب تسجيل الدخول أولاً');
     }
 
-    try {
-      setIsLoading(true);
-      console.log("Fetching player data for user:", user.uid);
-      
-      const playerRef = doc(db, 'players', user.uid);
-      const playerDoc = await getDoc(playerRef);
-      
-      if (playerDoc.exists()) {
-        const data = playerDoc.data() as PlayerState;
-        
-        // Handle legacy and new format for images
-        const profileImageUrl = data.profile_image_url || data.profile_image?.url || '';
-        const additionalImagesUrls = data.additional_image_urls || 
-          data.additional_images?.map(img => img.url) || [];
-
-        // Merge data with proper type conversion
-        const mergedData: PlayerState = {
-          ...defaultPlayerFields,
-          ...data,
-          birth_date: formatDate(data.birth_date),
-          profile_image: profileImageUrl ? { url: profileImageUrl } : null,
-          additional_images: additionalImagesUrls.map((url: string): MediaItem => ({ url })),
-        };
-        
-        console.log("Merged player data:", mergedData);
-        
-        setPlayerData(mergedData);
-        setFormData(mergedData);
-        setEditFormData(mergedData);
-      } else {
-        console.log("No player data found in Firestore");
-        // إذا لم يتم العثور على بيانات، قم بإنشاء وثيقة جديدة
-        const newPlayerData = {
-          ...defaultPlayerFields,
-          created_at: new Date(),
-          updated_at: new Date(),
-        };
-        
-        try {
-          await setDoc(playerRef, newPlayerData);
-          console.log("Created new player document");
-          setPlayerData(newPlayerData);
-          setFormData(newPlayerData);
-          setEditFormData(newPlayerData);
-        } catch (error) {
-          console.error("Error creating new player document:", error);
-          setFormErrors(prev => ({
-            ...prev,
-            create: 'حدث خطأ أثناء إنشاء الملف الشخصي'
-          }));
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching player data:', error);
-      setFormErrors(prev => ({
-        ...prev,
-        fetch: 'حدث خطأ أثناء جلب البيانات'
-      }));
-    } finally {
-      setIsLoading(false);
+    // Create unique file path
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${userId}/profile.${fileExt}`;
+    
+    console.log('Uploading profile image to:', filePath);
+    
+    // File validation
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error('حجم الملف يجب أن يكون أقل من 5 ميجابايت');
     }
-  }, [user]);
-
-  // Fetch data when user is authenticated
-  useEffect(() => {
-    if (user && !loading) {
-      fetchPlayerData();
+    
+    if (!file.type.startsWith('image/')) {
+      throw new Error('يجب أن يكون الملف صورة');
     }
-  }, [user, loading, fetchPlayerData]);
 
-  // Loading states
-  if (loading) {
-    return <LoadingSpinner />;
+    // Upload file to Supabase storage
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKETS.AVATARS)
+      .upload(filePath, file, {
+        upsert: true,
+        cacheControl: '3600',
+        contentType: file.type
+      });
+    
+    if (uploadError) {
+      throw new Error(`فشل في رفع الصورة: ${uploadError.message}`);
+    }
+
+    // Get public URL
+    const { data: urlData } = await supabase.storage
+      .from(BUCKETS.AVATARS)
+      .getPublicUrl(filePath);
+
+    if (!urlData?.publicUrl) {
+      throw new Error('فشل في الحصول على رابط الصورة');
+    }
+
+    return urlData.publicUrl.startsWith('http') 
+      ? urlData.publicUrl 
+      : `https://${urlData.publicUrl}`;
+
+  } catch (error) {
+    console.error('فشل في رفع صورة البروفايل:', error);
+    throw error;
+  }
+};
+
+const uploadAdditionalImage = async (
+  file: File,
+  userId: string,
+  idx: number = Date.now()
+): Promise<string> => {
+  try {
+    // تحديد امتداد الملف
+    const fileExt = file.name.split('.').pop();
+    // إنشاء مسار فريد للملف باستخدام الطابع الزمني
+    const filePath = `${userId}/additional_${Date.now()}_${idx}.${fileExt}`;
+    
+    console.log('Uploading additional image to:', filePath);
+    
+    // التحقق من حجم الملف (أقل من 5 ميجابايت)
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error('حجم الملف يجب أن يكون أقل من 5 ميجابايت');
+    }
+    
+    // التحقق من نوع الملف
+    if (!file.type.startsWith('image/')) {
+      throw new Error('يجب أن يكون الملف صورة');
+    }
+    
+    // رفع الملف إلى bucket player-images
+    const { error: uploadError, data } = await supabase.storage
+      .from(BUCKETS.PLAYER_IMAGES)
+      .upload(filePath, file, { 
+        upsert: true,
+        cacheControl: '3600',
+        contentType: file.type
+      });
+    
+    if (uploadError) {
+      console.error('خطأ أثناء رفع صورة إضافية:', uploadError);
+      throw new Error(`فشل في رفع الصورة: ${uploadError.message}`);
+    }
+    
+    // الحصول على الرابط العام للصورة
+    const { data: urlData } = await supabase.storage
+      .from(BUCKETS.PLAYER_IMAGES)
+      .getPublicUrl(filePath);
+    
+    if (!urlData?.publicUrl) {
+      throw new Error('فشل في الحصول على رابط الصورة');
+    }
+    
+    // تأكد من أن الرابط يبدأ بـ http
+    let url = urlData.publicUrl;
+    if (url && !url.startsWith('http')) {
+      url = 'https://' + url;
+    }
+    
+    console.log('تم رفع صورة إضافية بنجاح:', url);
+    return url;
+  } catch (error) {
+    console.error('فشل في رفع صورة إضافية:', error);
+    throw error;
+  }
+};
+
+const uploadWalletDocument = async (
+  file: File,
+  userId: string,
+  documentType: string
+): Promise<string> => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase configuration is missing');
   }
 
-  if (error) {
-    return <ErrorMessage message="حدث خطأ في تحميل الصفحة" />;
+  try {
+    // Check authentication first
+    await checkSupabaseAuth();
+
+    // تحديد امتداد الملف
+    const fileExt = file.name.split('.').pop();
+    // إنشاء مسار فريد للملف
+    const filePath = `${userId}/${documentType}_${Date.now()}.${fileExt}`;
+    
+    console.log('Uploading wallet document to:', filePath);
+    
+    // رفع الملف إلى bucket wallet
+    const { error: uploadError, data } = await supabase.storage
+      .from(BUCKETS.WALLET)
+      .upload(filePath, file, { 
+        upsert: true,
+        cacheControl: '3600'
+      });
+    
+    if (uploadError) {
+      console.error('خطأ أثناء رفع وثيقة المحفظة:', uploadError);
+      throw new Error(`فشل في رفع الوثيقة: ${uploadError.message}`);
+    }
+    
+    // الحصول على الرابط العام للوثيقة
+    const { data: urlData } = await supabase.storage
+      .from(BUCKETS.WALLET)
+      .getPublicUrl(filePath);
+    
+    if (!urlData?.publicUrl) {
+      throw new Error('فشل في الحصول على رابط الوثيقة');
+    }
+    
+    // تأكد من أن الرابط يبدأ بـ http
+    let url = urlData.publicUrl;
+    if (url && !url.startsWith('http')) {
+      url = 'https://' + url;
+    }
+    
+    console.log('تم رفع وثيقة المحفظة بنجاح:', url);
+    return url;
+  } catch (error) {
+    console.error('فشل في رفع وثيقة المحفظة:', error);
+    throw error;
   }
+};
 
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <h1 className="mb-4 text-2xl font-bold">يرجى تسجيل الدخول</h1>
-        <Button onClick={() => router.push('/login')}>
-          تسجيل الدخول
-        </Button>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
-  // =========== Supabase Storage Functions ===========
-  
-  // Update uploadProfileImage function
-  const uploadProfileImage = async (file, userId) => {
-    try {
-      // Check authentication first
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
-        throw new Error('يجب تسجيل الدخول أولاً');
-      }
-
-      // تحديد امتداد الملف
-      const fileExt = file.name.split('.').pop();
-      // إنشاء مسار فريد للملف
-      const filePath = `${userId}/profile.${fileExt}`;
-      
-      console.log('Uploading profile image to:', filePath);
-      
-      // التحقق من حجم الملف (أقل من 5 ميجابايت)
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error('حجم الملف يجب أن يكون أقل من 5 ميجابايت');
-      }
-      
-      // التحقق من نوع الملف
-      if (!file.type.startsWith('image/')) {
-        throw new Error('يجب أن يكون الملف صورة');
-      }
-      
-      // رفع الملف إلى bucket avatars
-      const { error: uploadError, data } = await supabase.storage
-        .from(BUCKETS.AVATARS)
-        .upload(filePath, file, { 
-          upsert: true,
-          cacheControl: '3600',
-          contentType: file.type
-        });
-      
-      if (uploadError) {
-        console.error('خطأ أثناء رفع صورة البروفايل:', uploadError);
-        throw new Error(`فشل في رفع الصورة: ${uploadError.message}`);
-      }
-      
-      // الحصول على الرابط العام للصورة
-      const { data: urlData } = await supabase.storage
-        .from(BUCKETS.AVATARS)
-        .getPublicUrl(filePath);
-      
-      if (!urlData?.publicUrl) {
-        throw new Error('فشل في الحصول على رابط الصورة');
-      }
-      
-      // تأكد من أن الرابط يبدأ بـ http
-      let url = urlData.publicUrl;
-      if (url && !url.startsWith('http')) {
-        url = 'https://' + url;
-      }
-      
-      console.log('تم رفع صورة البروفايل بنجاح:', url);
-      return url;
-    } catch (error) {
-      console.error('فشل في رفع صورة البروفايل:', error);
-      throw error;
-    }
-  };
-
-  // Update uploadAdditionalImage function
-  const uploadAdditionalImage = async (file, userId, idx = Date.now()) => {
-    try {
-      // تحديد امتداد الملف
-      const fileExt = file.name.split('.').pop();
-      // إنشاء مسار فريد للملف باستخدام الطابع الزمني
-      const filePath = `${userId}/additional_${Date.now()}_${idx}.${fileExt}`;
-      
-      console.log('Uploading additional image to:', filePath);
-      
-      // التحقق من حجم الملف (أقل من 5 ميجابايت)
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error('حجم الملف يجب أن يكون أقل من 5 ميجابايت');
-      }
-      
-      // التحقق من نوع الملف
-      if (!file.type.startsWith('image/')) {
-        throw new Error('يجب أن يكون الملف صورة');
-      }
-      
-      // رفع الملف إلى bucket player-images
-      const { error: uploadError, data } = await supabase.storage
-        .from(BUCKETS.PLAYER_IMAGES)
-        .upload(filePath, file, { 
-          upsert: true,
-          cacheControl: '3600',
-          contentType: file.type
-        });
-      
-      if (uploadError) {
-        console.error('خطأ أثناء رفع صورة إضافية:', uploadError);
-        throw new Error(`فشل في رفع الصورة: ${uploadError.message}`);
-      }
-      
-      // الحصول على الرابط العام للصورة
-      const { data: urlData } = await supabase.storage
-        .from(BUCKETS.PLAYER_IMAGES)
-        .getPublicUrl(filePath);
-      
-      if (!urlData?.publicUrl) {
-        throw new Error('فشل في الحصول على رابط الصورة');
-      }
-      
-      // تأكد من أن الرابط يبدأ بـ http
-      let url = urlData.publicUrl;
-      if (url && !url.startsWith('http')) {
-        url = 'https://' + url;
-      }
-      
-      console.log('تم رفع صورة إضافية بنجاح:', url);
-      return url;
-    } catch (error) {
-      console.error('فشل في رفع صورة إضافية:', error);
-      throw error;
-    }
-  };
-
-  // Update uploadWalletDocument function
-  const uploadWalletDocument = async (file, userId, documentType) => {
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Supabase configuration is missing');
-    }
-
-    try {
-      // Check authentication first
-      await checkSupabaseAuth();
-
-      // تحديد امتداد الملف
-      const fileExt = file.name.split('.').pop();
-      // إنشاء مسار فريد للملف
-      const filePath = `${userId}/${documentType}_${Date.now()}.${fileExt}`;
-      
-      console.log('Uploading wallet document to:', filePath);
-      
-      // رفع الملف إلى bucket wallet
-      const { error: uploadError, data } = await supabase.storage
-        .from(BUCKETS.WALLET)
-        .upload(filePath, file, { 
-          upsert: true,
-          cacheControl: '3600'
-        });
-      
-      if (uploadError) {
-        console.error('خطأ أثناء رفع وثيقة المحفظة:', uploadError);
-        throw new Error(`فشل في رفع الوثيقة: ${uploadError.message}`);
-      }
-      
-      // الحصول على الرابط العام للوثيقة
-      const { data: urlData } = await supabase.storage
-        .from(BUCKETS.WALLET)
-        .getPublicUrl(filePath);
-      
-      if (!urlData?.publicUrl) {
-        throw new Error('فشل في الحصول على رابط الوثيقة');
-      }
-      
-      // تأكد من أن الرابط يبدأ بـ http
-      let url = urlData.publicUrl;
-      if (url && !url.startsWith('http')) {
-        url = 'https://' + url;
-      }
-      
-      console.log('تم رفع وثيقة المحفظة بنجاح:', url);
-      return url;
-    } catch (error) {
-      console.error('فشل في رفع وثيقة المحفظة:', error);
-      throw error;
-    }
-  };
-
-  // =========== Form Handling Functions ===========
+// =========== Form Handling Functions ===========
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -725,9 +586,9 @@ export default function PlayerProfile() {
   };
   
   // File upload handler for profile image
-  const handleProfileImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.uid) return;
     
     setUploadingProfileImage(true);
     setFormErrors(prev => ({ ...prev, profileImage: '' }));
@@ -1405,7 +1266,7 @@ export default function PlayerProfile() {
           </div>
         )}
       </div>
-    );
+    };
   };
 
   // Render Objectives Section
