@@ -272,6 +272,8 @@ interface VideoItem {
 interface PlayerState extends PlayerData {
   created_at?: Date;
   updated_at?: Date;
+  profile_image_url?: string;
+  additional_image_urls?: string[];
 }
 
 export default function PlayerProfile() {
@@ -336,32 +338,12 @@ export default function PlayerProfile() {
       if (playerDoc.exists()) {
         const data = playerDoc.data() as PlayerState;
         
-        // Helper function to format date
-        type DateValue = Date | string | { toDate: () => Date } | null | undefined;
-        const formatDate = (dateValue: DateValue): string => {
-          if (!dateValue) return '';
-          try {
-            if (dateValue && typeof dateValue === 'object' && 'toDate' in dateValue) {
-              return dateValue.toDate().toISOString().split('T')[0];
-            }
-            if (typeof dateValue === 'string') {
-              return new Date(dateValue).toISOString().split('T')[0];
-            }
-            if (dateValue instanceof Date) {
-              return dateValue.toISOString().split('T')[0];
-            }
-            return '';
-          } catch (error) {
-            console.error('Error formatting date:', error);
-            return '';
-          }
-        };
-        
-        // معالجة الصور والروابط
-        let profileImageUrl = data.profile_image_url || '';
-        let additionalImagesUrls = data.additional_image_urls || [];
-        
-        // دمج البيانات
+        // Handle legacy and new format for images
+        const profileImageUrl = data.profile_image_url || data.profile_image?.url || '';
+        const additionalImagesUrls = data.additional_image_urls || 
+          data.additional_images?.map(img => img.url) || [];
+
+        // Merge data with proper type conversion
         const mergedData: PlayerState = {
           ...defaultPlayerFields,
           ...data,
