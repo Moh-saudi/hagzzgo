@@ -214,8 +214,8 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
   );
 };
 
-// Helper function to combine classes
-function classNames(...classes) {
+// Helper function to combine classes with proper TypeScript types
+function classNames(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }
 
