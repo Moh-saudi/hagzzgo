@@ -1656,14 +1656,14 @@ const FileText: React.FC<IconProps> = ({ size = 24, ...props }) => (
   </svg>
 );
 
-// Define the main component
-const PlayerProfilePage: React.FC = () => {
+// Main component
+const PlayerProfilePage = () => {
   // ...existing state and hooks declarations...
-
+  
   // ...existing helper functions...
-
+  
   // ...existing section render functions...
-
+  
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir="rtl">
