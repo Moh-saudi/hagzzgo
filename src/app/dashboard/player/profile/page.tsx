@@ -14,17 +14,86 @@ import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "r
 // Supabase Client
 import { createClient } from '@supabase/supabase-js';
 
-// 1. إضافة تهيئة Supabase آمنة في بداية الملف
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
+// Types
+interface IconProps extends React.SVGProps<SVGSVGElement> {
+  size?: number;
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+interface PlayerState {
+  full_name: string;
+  birth_date: string | null;
+  nationality: string;
+  city: string;
+  country: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  brief: string;
+  education_level: string;
+  graduation_year: string;
+  english_level: string;
+  arabic_level: string;
+  spanish_level: string;
+  blood_type: string;
+  height: string;
+  weight: string;
+  chronic_details: string;
+  primary_position: string;
+  secondary_position: string;
+  preferred_foot: string;
+  technical_skills: Record<string, unknown>;
+  physical_skills: Record<string, unknown>;
+  social_skills: Record<string, unknown>;
+  objectives: Record<string, unknown>;
+  profile_image: null | { url: string };
+  additional_images: Array<{ url: string }>;
+  videos: Array<string>;
+  training_courses: Array<string>;
+}
 
-// Constants & Reference Data
+interface FormErrors {
+  fetch?: string;
+  submit?: string;
+  profileImage?: string;
+  additionalImage?: string;
+  videos?: string;
+  general?: string;
+  [key: string]: string | undefined;
+}
+
+interface PlayerFormData {
+  full_name: string;
+  birth_date: string | null;
+  nationality: string;
+  city: string;
+  country: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  brief: string;
+  education_level: string;
+  graduation_year: string;
+  english_level: string;
+  arabic_level: string;
+  spanish_level: string;
+  blood_type: string;
+  height: string;
+  weight: string;
+  chronic_details: string;
+  primary_position: string;
+  secondary_position: string;
+  preferred_foot: string;
+  technical_skills: Record<string, unknown>;
+  physical_skills: Record<string, unknown>;
+  social_skills: Record<string, unknown>;
+  objectives: Record<string, unknown>;
+  profile_image: null | { url: string };
+  additional_images: Array<{ url: string }>;
+  videos: Array<string>;
+  training_courses: Array<string>;
+}
+
+// Constants
 const STEPS = {
   PERSONAL: 1,
   EDUCATION: 2,
@@ -98,11 +167,25 @@ const defaultPlayerFields = {
 };
 
 // Helper function to combine classes
-function classNames(...classes) {
+const classNames = (...classes: (string | boolean | undefined | null)[]): string => {
   return classes.filter(Boolean).join(' ');
-}
+};
 
-export default function PlayerProfile() {
+// Supabase Setup with Type Safety
+const initSupabase = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  return createClient(supabaseUrl, supabaseKey);
+};
+
+const supabase = initSupabase();
+
+const PlayerProfile: React.FC = () => {
   console.log('PlayerProfile: component start');
   const router = useRouter();
   const [user, loading, error] = useAuthState(auth);
@@ -111,10 +194,40 @@ export default function PlayerProfile() {
   const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL);
   const [submitting, setSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [formErrors, setFormErrors] = useState({});
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [playerData, setPlayerData] = useState(null);
-  const [formData, setFormData] = useState({ ...defaultPlayerFields });
+  const [playerData, setPlayerData] = useState<PlayerState | null>(null);
+  const [formData, setFormData] = useState<PlayerFormData>({
+    full_name: '',
+    birth_date: null,
+    nationality: '',
+    city: '',
+    country: '',
+    phone: '',
+    whatsapp: '',
+    email: '',
+    brief: '',
+    education_level: '',
+    graduation_year: '',
+    english_level: '',
+    arabic_level: '',
+    spanish_level: '',
+    blood_type: '',
+    height: '',
+    weight: '',
+    chronic_details: '',
+    primary_position: '',
+    secondary_position: '',
+    preferred_foot: '',
+    technical_skills: {},
+    physical_skills: {},
+    social_skills: {},
+    objectives: {},
+    profile_image: null,
+    additional_images: [],
+    videos: [],
+    training_courses: [],
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({});
   const [editError, setEditError] = useState('');
@@ -188,7 +301,7 @@ export default function PlayerProfile() {
    * @param {string} userId - معرف المستخدم
    * @returns {Promise<string>} - رابط الصورة
    */
-  const uploadProfileImage = async (file, userId) => {
+  const uploadProfileImage = async (file: File, userId: string): Promise<string> => {
     try {
       // تحديد امتداد الملف
       const fileExt = file.name.split('.').pop();
@@ -231,7 +344,7 @@ export default function PlayerProfile() {
    * @param {number} idx - فهرس الصورة (اختياري)
    * @returns {Promise<string>} - رابط الصورة
    */
-  const uploadAdditionalImage = async (file, userId, idx = Date.now()) => {
+  const uploadAdditionalImage = async (file: File, userId: string, idx: number = Date.now()): Promise<string> => {
     try {
       // تحديد امتداد الملف
       const fileExt = file.name.split('.').pop();
@@ -345,7 +458,7 @@ export default function PlayerProfile() {
   // =========== Form Handling Functions ===========
 
   // Handle input changes
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -414,28 +527,28 @@ export default function PlayerProfile() {
   // =========== Media Handling Functions ===========
 
   // Add/remove images and videos
-  const handleAddImage = (url) => {
+  const handleAddImage = (url: string) => {
     setEditFormData(prev => ({
       ...prev,
       additional_images: [...(prev.additional_images || []), { url }],
     }));
   };
   
-  const handleRemoveImage = (idx) => {
+  const handleRemoveImage = (idx: number) => {
     setEditFormData(prev => ({
       ...prev,
       additional_images: prev.additional_images.filter((_, i) => i !== idx),
     }));
   };
   
-  const handleAddVideo = (video) => {
+  const handleAddVideo = (video: string) => {
     setEditFormData(prev => ({
       ...prev,
       videos: [...(prev.videos || []), video],
     }));
   };
   
-  const handleRemoveVideo = (idx) => {
+  const handleRemoveVideo = (idx: number) => {
     setEditFormData(prev => ({
       ...prev,
       videos: prev.videos.filter((_, i) => i !== idx),
@@ -443,8 +556,8 @@ export default function PlayerProfile() {
   };
   
   // File upload handler for profile image
-  const handleProfileImageUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
     
     setUploadingProfileImage(true);
@@ -468,8 +581,8 @@ export default function PlayerProfile() {
   };
   
   // File upload handler for additional images
-  const handleAdditionalImageUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleAdditionalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
     
     setUploadingAdditionalImages(prev => ({ ...prev, new: true }));
@@ -496,10 +609,44 @@ export default function PlayerProfile() {
     }
   };
   
+  /**
+   * معالج رفع الصور إلى Supabase
+   */
+  const handleImageUpload = async (file: File, bucket: string, path: string) => {
+    try {
+      // التحقق من الملف
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('حجم الملف يجب أن يكون أقل من 5 ميجابايت');
+      }
+
+      if (!file.type.startsWith('image/')) {
+        throw new Error('يجب أن يكون الملف صورة');
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(path, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(path);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
   // =========== Field Rendering Helpers ===========
 
   // Render input or value based on edit mode
-  const renderField = (name, type = 'text') =>
+  const renderField = (name: keyof PlayerState, type: string = 'text') =>
     isEditing ? (
       <input
         type={type}
@@ -515,7 +662,7 @@ export default function PlayerProfile() {
     );
 
   // Render textarea based on edit mode
-  const renderTextarea = (name) =>
+  const renderTextarea = (name: keyof PlayerState) =>
     isEditing ? (
       <textarea
         name={name}
@@ -530,7 +677,7 @@ export default function PlayerProfile() {
     );
 
   // Helper to check if a video URL is embeddable
-  const getVideoEmbed = (url) => {
+  const getVideoEmbed = (url: string) => {
     if (!url) return null;
     
     // YouTube

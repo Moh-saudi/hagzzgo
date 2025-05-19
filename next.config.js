@@ -14,6 +14,10 @@ const nextConfig = {
   // Add other configurations here
   reactStrictMode: true,
   swcMinify: true,
+  optimizeFonts: false,
+  experimental: {
+    appDir: true
+  }
 }
 
 module.exports = nextConfig
