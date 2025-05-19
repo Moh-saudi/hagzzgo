@@ -226,6 +226,48 @@ const BUCKETS = {
   WALLET: 'wallet'
 };
 
+// Add type for media items
+interface MediaItem {
+  url: string;
+}
+
+interface PlayerData {
+  full_name: string;
+  birth_date: string | Date;
+  nationality: string;
+  city: string;
+  country: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  brief: string;
+  education_level: string;
+  graduation_year: string;
+  english_level: string;
+  arabic_level: string;
+  spanish_level: string;
+  blood_type: string;
+  height: string;
+  weight: string;
+  chronic_details: string;
+  primary_position: string;
+  secondary_position: string;
+  preferred_foot: string;
+  technical_skills: Record<string, number>;
+  physical_skills: Record<string, number>;
+  social_skills: Record<string, number>;
+  objectives: Record<string, boolean | string>;
+  profile_image: MediaItem | null;
+  additional_images: MediaItem[];
+  videos: VideoItem[];
+  training_courses: string[];
+}
+
+interface VideoItem {
+  url: string;
+  description: string;
+}
+
 export default function PlayerProfile() {
   const router = useRouter();
   const [user, loading, error] = useAuthState(auth);
@@ -323,7 +365,7 @@ export default function PlayerProfile() {
           ...data,
           birth_date: formatDate(data.birth_date),
           profile_image: profileImageUrl ? { url: profileImageUrl } : null,
-          additional_images: additionalImagesUrls.map(url => ({ url })),
+          additional_images: additionalImagesUrls.map((url: string): MediaItem => ({ url })),
         };
         
         console.log("Merged player data:", mergedData);
