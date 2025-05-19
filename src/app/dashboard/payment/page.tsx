@@ -17,10 +17,18 @@ import {
 import { X } from 'lucide-react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib/firebase/config';
+<<<<<<< HEAD
 
 // إعدادات Supabase
 const supabaseUrl = 'https://ekyerljzfokqimbabzxm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVreWVybGp6Zm9rcWltYmFienhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2NTcyODMsImV4cCI6MjA2MjIzMzI4M30.Xd6Cg8QUISHyCG-qbgo9HtWUZz6tvqAqG6KKXzuetBY';
+=======
+import { createClient } from '@supabase/supabase-js';
+
+// إعدادات Supabase
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+>>>>>>> e95bc34 (Initial commit)
 
 // التحقق من إعدادات Supabase
 if (!supabaseUrl || !supabaseKey) {
@@ -35,6 +43,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
   }
 });
 
+<<<<<<< HEAD
 function createClient(supabaseUrl: string, supabaseKey: string, config: { auth: { persistSession: boolean; autoRefreshToken: boolean; detectSessionInUrl: boolean; }; }) {
   if (!supabaseUrl || !supabaseKey) {
     throw new Error('Missing Supabase URL or key');
@@ -74,3 +83,5 @@ function createClient(supabaseUrl: string, supabaseKey: string, arg2: { auth: { 
   throw new Error('Function not implemented.');
 }
 
+=======
+>>>>>>> e95bc34 (Initial commit)

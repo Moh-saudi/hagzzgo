@@ -1,10 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap');
+<<<<<<< HEAD
 @import 'tailwindcss/tailwind.css';
+=======
+>>>>>>> e95bc34 (Initial commit)
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+<<<<<<< HEAD
+=======
+/* --- تم تعليق باقي الأكواد مؤقتًا لاختبار الخطأ --- */
+/*
+// ... باقي الأكواد الأصلية هنا ...
+*/
+
+>>>>>>> e95bc34 (Initial commit)
 /* تعريف متغيرات الألوان */
 :root {
   --background: #ffffff;
@@ -16,9 +27,13 @@
   --warning: #f59e0b; /* لون التحذير */
   --error: #ef4444; /* لون الخطأ */
 <<<<<<< HEAD
+<<<<<<< HEAD
   --font-cairo: 'Cairo', sans-serif;
 =======
 >>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
+=======
+  --font-cairo: 'Cairo', sans-serif;
+>>>>>>> e95bc34 (Initial commit)
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,10 +51,14 @@ body {
   color: var(--foreground);
   background: var(--background);
 <<<<<<< HEAD
+<<<<<<< HEAD
   font-family: var(--font-cairo);
 =======
   font-family: 'Cairo', sans-serif; /* تطبيق خط Cairo */
 >>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
+=======
+  font-family: var(--font-cairo);
+>>>>>>> e95bc34 (Initial commit)
   line-height: 1.6;
   direction: rtl !important; /* توجيه النصوص إلى اليمين */
 }
@@ -74,9 +93,13 @@ a:hover {
 /* أنماط للعناوين */
 h1, h2, h3, h4, h5, h6 {
 <<<<<<< HEAD
+<<<<<<< HEAD
   font-family: var(--font-cairo);
 =======
 >>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
+=======
+  font-family: var(--font-cairo);
+>>>>>>> e95bc34 (Initial commit)
   font-weight: 700;
   color: var(--foreground);
 }
@@ -194,6 +217,9 @@ img {
     background-color: var(--secondary);
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e95bc34 (Initial commit)
 }
 
 /* تحسين مظهر النصوص العربية */
@@ -206,6 +232,9 @@ img {
 /* تحسين مظهر النصوص */
 p, span, div {
   font-weight: 400;
+<<<<<<< HEAD
 =======
 >>>>>>> bca22f5650d9d75baeb93f1e7ba3fc2055bf8bd6
+=======
+>>>>>>> e95bc34 (Initial commit)
 }
