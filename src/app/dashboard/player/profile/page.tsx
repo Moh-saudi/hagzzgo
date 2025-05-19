@@ -1623,32 +1623,181 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
 }
 
-// Export the component
-export default PlayerProfilePage;
+// Define the main component
+const PlayerProfilePage: React.FC = () => {
+  // ...existing state and hooks declarations...
 
-// Icon components with proper types
-export const Phone: React.FC<IconProps> = (props) => (
+  // ...existing helper functions...
+
+  // ...existing section render functions...
+
+  return (
+    <DashboardLayout>
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir="rtl">
+        {/* Loading Overlay */}
+        {submitting && <LoadingSpinner />}
+
+        {/* Success Message */}
+        {successMessage && <SuccessMessage message={successMessage} />}
+
+        {/* Error Message */}
+        {Object.keys(formErrors).length > 0 && (
+          <ErrorMessage message={Object.values(formErrors)[0]} />
+        )}
+
+        <header className="py-6 text-white bg-gradient-to-r from-blue-600 to-blue-800">
+          <div className="container px-4 mx-auto">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl font-bold">نموذج تسجيل لاعب كرة القدم</h1>
+              {user && (
+                <div className="flex items-center gap-4">
+                  <p className="text-blue-100">مرحباً {user.email}</p>
+                  <Button
+                    onClick={() => setIsEditing(!isEditing)}
+                    className="flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50"
+                  >
+                    {isEditing ? (
+                      <>
+                        <X className="w-4 h-4" />
+                        إلغاء التعديل
+                      </>
+                    ) : (
+                      <>
+                        <Edit className="w-4 h-4" />
+                        تعديل البيانات
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <main className="container px-4 py-8 mx-auto">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }} className="p-6 bg-white rounded-lg shadow-lg">
+            {/* Progress Steps */}
+            <ProgressSteps currentStep={currentStep} />
+
+            {/* Form Sections */}
+            {currentStep === STEPS.PERSONAL && renderPersonalInfo()}
+            {currentStep === STEPS.EDUCATION && renderEducation()}
+            {currentStep === STEPS.MEDICAL && renderMedicalRecord()}
+            {currentStep === STEPS.SPORTS && renderSportsInfo()}
+            {currentStep === STEPS.SKILLS && renderSkills()}
+            {currentStep === STEPS.OBJECTIVES && renderObjectives()}
+            {currentStep === STEPS.MEDIA && renderMedia()}
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8">
+              {currentStep > 1 && (
+                <Button
+                  type="button"
+                  onClick={() => setCurrentStep(prev => prev - 1)}
+                  className="flex items-center"
+                >
+                  <ChevronRight className="ml-2" />
+                  السابق
+                </Button>
+              )}
+              {currentStep < Object.keys(STEP_TITLES).length ? (
+                <Button
+                  type="button"
+                  onClick={() => setCurrentStep(prev => prev + 1)}
+                  className="flex items-center"
+                >
+                  التالي
+                  <ChevronLeft className="mr-2" />
+                </Button>
+              ) : (
+                <div className="flex gap-4">
+                  {isEditing && (
+                    <Button
+                      type="button"
+                      onClick={handleCancel}
+                      variant="outline"
+                      className="flex items-center"
+                    >
+                      <X className="mr-2" />
+                      إلغاء
+                    </Button>
+                  )}
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex items-center"
+                  >
+                    {submitting ? 'جاري الحفظ...' : 'حفظ البيانات'}
+                    <Check className="mr-2" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </form>
+        </main>
+
+        {/* Footer */}
+        <footer className="py-8 mt-12 text-white bg-gray-800">
+          <div className="container px-4 mx-auto">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">روابط مهمة</h3>
+                <ul className="space-y-2">
+                  <li><a href="#" className="hover:text-blue-400">الشروط والأحكام</a></li>
+                  <li><a href="#" className="hover:text-blue-400">سياسة الخصوصية</a></li>
+                  <li><a href="#" className="hover:text-blue-400">الأسئلة الشائعة</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">تواصل معنا</h3>
+                <ul className="space-y-2">
+                  <li>البريد الإلكتروني: support@example.com</li>
+                  <li>الهاتف: +966 55 555 5555</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">تابعنا</h3>
+                <div className="flex space-x-4">
+                  {/* Add social media icons/links here */}
+                </div>
+              </div>
+            </div>
+            <div className="pt-8 mt-8 text-center border-t border-gray-700">
+              <p>&copy; {new Date().getFullYear()} جميع الحقوق محفوظة</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </DashboardLayout>
+  );
+}
+
+// Icon components
+export const Phone: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
     viewBox="0 0 24 24" 
     fill="none" 
     stroke="currentColor" 
-    width={props.size || 24}
-    height={props.size || 24}
+    width={size}
+    height={size}
     {...props}
   >
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
   </svg>
 );
 
-export const FileText: React.FC<IconProps> = (props) => (
+export const FileText: React.FC<IconProps> = ({ size = 24, ...props }) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
     viewBox="0 0 24 24" 
     fill="none" 
     stroke="currentColor" 
-    width={props.size || 24}
-    height={props.size || 24}
+    width={size}
+    height={size}
     {...props}
   >
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -1658,3 +1807,5 @@ export const FileText: React.FC<IconProps> = (props) => (
     <polyline points="10 9 9 9 8 9"/>
   </svg>
 );
+
+export default PlayerProfilePage;
