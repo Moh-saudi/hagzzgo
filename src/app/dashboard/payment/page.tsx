@@ -36,4 +36,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
   }
 });
 
-// Rest of your component code
+// Export your component
+export default function PaymentPage() {
+  // Your component code here
+}

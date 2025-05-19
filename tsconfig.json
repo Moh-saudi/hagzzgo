@@ -35,7 +35,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/dashboard/player/profile/page.js"
+    "src/app/dashboard/player/profile/pagggge.js"
   ],
   "exclude": [
     "node_modules"

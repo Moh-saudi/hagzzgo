@@ -20,7 +20,10 @@ import {
   Brain, 
   Target, 
   Settings, 
-  LogOut
+  LogOut,
+  Search,
+  Bell,
+  Video
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -58,7 +61,7 @@ function WelcomePopup({ onClose }: { onClose: () => void }) {
 
 export default function PlayerDashboard() {
   const [showWelcome, setShowWelcome] = useState(true);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {

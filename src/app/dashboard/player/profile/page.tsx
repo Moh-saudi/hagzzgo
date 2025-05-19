@@ -116,21 +116,25 @@ const LoadingSpinner = () => (
 );
 
 // Error Message Component
-const ErrorMessage = ({ message }) => (
+const ErrorMessage = ({ message }: { message: string }) => (
   <div className="p-4 mb-4 text-red-700 bg-red-100 rounded-lg">
     <p>{message}</p>
   </div>
 );
 
 // Success Message Component
-const SuccessMessage = ({ message }) => (
+const SuccessMessage = ({ message }: { message: string }) => (
   <div className="p-4 mb-4 text-green-700 bg-green-100 rounded-lg">
     <p>{message}</p>
   </div>
 );
 
 // Progress Steps Component
-const ProgressSteps = ({ currentStep }) => {
+interface ProgressStepsProps {
+  currentStep: number;
+}
+
+const ProgressSteps: React.FC<ProgressStepsProps> = ({ currentStep }) => {
   const steps = Object.entries(STEP_TITLES).map(([step, title]) => ({
     number: Number(step),
     title
