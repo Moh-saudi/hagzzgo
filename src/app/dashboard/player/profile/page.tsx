@@ -1,6 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
+// Loading Spinner Component
+const LoadingSpinner: React.FC = () => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="w-16 h-16 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+  </div>
+);
+
+// Success Message Component
+const SuccessMessage: React.FC<{ message: string }> = ({ message }) => (
+  <div className="fixed inset-x-0 top-0 z-50 p-4">
+    <div className="w-full max-w-md p-4 mx-auto bg-green-100 rounded-lg shadow-lg">
+      <div className="flex items-center">
+        <Check className="w-5 h-5 mr-2 text-green-500" />
+        <p className="text-green-700">{message}</p>
+      </div>
+    </div>
+  </div>
+);
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -56,7 +75,7 @@ interface FormErrors {
   submit?: string;
   profileImage?: string;
   additionalImage?: string;
-  videos?: string;
+  video?: string;
   general?: string;
   [key: string]: string | undefined;
 }
@@ -185,7 +204,7 @@ const initSupabase = () => {
 
 const supabase = initSupabase();
 
-const PlayerProfile: React.FC = () => {
+export default function PlayerProfile() {
   console.log('PlayerProfile: component start');
   const router = useRouter();
   const [user, loading, error] = useAuthState(auth);
@@ -271,7 +290,7 @@ const PlayerProfile: React.FC = () => {
     );
   }
 
-  if (error || formErrors.fetch) {
+  if (error || (formErrors && 'fetch' in formErrors)) {
     console.log('PlayerProfile: Rendering error state', error, formErrors.fetch);
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -756,465 +775,479 @@ const PlayerProfile: React.FC = () => {
         </div>
       </div>
       
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">الجنسية</label>
-          {renderField('nationality')}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">المدينة</label>
-          {renderField('city')}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">الدولة</label>
-          {renderField('country')}
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">رقم الهاتف</label>
-          {renderField('phone')}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">رقم الواتساب</label>
-          {renderField('whatsapp')}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">البريد الإلكتروني</label>
-          {renderField('email')}
-        </div>
-      </div>
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700">نبذة عن اللاعب</label>
-        {renderTextarea('brief')}
-      </div>
-    </div>
-  );
-  // Render Education Section
-  const renderEducation = () => (
-    <div className="space-y-6">
-      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المعلومات التعليمية</h2>
+     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+       <div>
+         <label className="block text-sm font-medium text-gray-700">الجنسية</label>
+         {renderField('nationality')}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">المدينة</label>
+         {renderField('city')}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">الدولة</label>
+         {renderField('country')}
+       </div>
+     </div>
+     
+     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+       <div>
+         <label className="block text-sm font-medium text-gray-700">رقم الهاتف</label>
+         {renderField('phone')}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">رقم الواتساب</label>
+         {renderField('whatsapp')}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">البريد الإلكتروني</label>
+         {renderField('email')}
+       </div>
+     </div>
+     
+     <div>
+       <label className="block text-sm font-medium text-gray-700">نبذة عن اللاعب</label>
+       {renderTextarea('brief')}
+     </div>
+   </div>
+ );
+ // Render Education Section
+ const renderEducation = () => (
+   <div className="space-y-6">
+     <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المعلومات التعليمية</h2>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">المؤهل الدراسي</label>
-          {isEditing ? (
-            <select
-              name="education_level"
-              value={editFormData.education_level || ''}
-              onChange={handleInputChange}
-              className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
-            >
-              <option value="">اختر</option>
-              {REFERENCE_DATA.educationLevels.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          ) : (
-            <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-              {formData.education_level || 'غير محدد'}
-            </div>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">سنة التخرج</label>
-          {renderField('graduation_year')}
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">مستوى اللغة الإنجليزية</label>
-          {isEditing ? (
-            <select
-              name="english_level"
-              value={editFormData.english_level || ''}
-              onChange={handleInputChange}
-              className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
-            >
-              <option value="">اختر</option>
-              {REFERENCE_DATA.languageLevels.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          ) : (
-            <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-              {formData.english_level || 'غير محدد'}
-            </div>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">مستوى اللغة العربية</label>
-          {isEditing ? (
-            <select
-              name="arabic_level"
-              value={editFormData.arabic_level || ''}
-              onChange={handleInputChange}
-              className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
-            >
-              <option value="">اختر</option>
-              {REFERENCE_DATA.languageLevels.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          ) : (
-            <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-              {formData.arabic_level || 'غير محدد'}
-            </div>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">مستوى اللغة الإسبانية</label>
-          {isEditing ? (
-            <select
-              name="spanish_level"
-              value={editFormData.spanish_level || ''}
-              onChange={handleInputChange}
-              className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
-            >
-              <option value="">اختر</option>
-              {REFERENCE_DATA.languageLevels.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          ) : (
-            <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-              {formData.spanish_level || 'غير محدد'}
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Training Courses */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">الدورات التدريبية</label>
-        {isEditing ? (
-          <div>
-            {(editFormData.training_courses || []).map((course, idx) => (
-              <div key={idx} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={course}
-                  onChange={e => {
-                    const updated = [...editFormData.training_courses];
-                    updated[idx] = e.target.value;
-                    setEditFormData({ ...editFormData, training_courses: updated });
-                  }}
-                  className="flex-1 p-2 border rounded"
-                />
-                <button 
-                  type="button" 
-                  onClick={() => {
-                    const updated = [...editFormData.training_courses];
-                    updated.splice(idx, 1);
-                    setEditFormData({ ...editFormData, training_courses: updated });
-                  }} 
-                  className="p-1 text-red-500 rounded bg-red-50 hover:bg-red-100"
-                >
-                  <Trash size={18} />
-                </button>
-              </div>
-            ))}
-            <button 
-              type="button" 
-              onClick={() => setEditFormData({ 
-                ...editFormData, 
-                training_courses: [...(editFormData.training_courses || []), ''] 
-              })} 
-              className="flex items-center mt-2 text-blue-600 hover:text-blue-700"
-            >
-              <Plus size={16} className="mr-1" /> إضافة دورة
-            </button>
-          </div>
-        ) : (
-          <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-            {(formData.training_courses || []).length === 0 ? 
-              'لا توجد دورات' : 
-              formData.training_courses.map((course, idx) => (
-                <div key={idx} className="py-1">
-                  {idx + 1}. {course}
-                </div>
-              ))
-            }
-          </div>
-        )}
-      </div>
-    </div>
-  );
+     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+       <div>
+         <label className="block text-sm font-medium text-gray-700">المؤهل الدراسي</label>
+         {isEditing ? (
+           <select
+             name="education_level"
+             value={editFormData.education_level || ''}
+             onChange={handleInputChange}
+             className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
+           >
+             <option value="">اختر</option>
+             {REFERENCE_DATA.educationLevels.map(opt => (
+               <option key={opt} value={opt}>{opt}</option>
+             ))}
+           </select>
+         ) : (
+           <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+             {formData.education_level || 'غير محدد'}
+           </div>
+         )}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">سنة التخرج</label>
+         {renderField('graduation_year')}
+       </div>
+     </div>
+     
+     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+       <div>
+         <label className="block text-sm font-medium text-gray-700">مستوى اللغة الإنجليزية</label>
+         {isEditing ? (
+           <select
+             name="english_level"
+             value={editFormData.english_level || ''}
+             onChange={handleInputChange}
+             className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
+           >
+             <option value="">اختر</option>
+             {REFERENCE_DATA.languageLevels.map(opt => (
+               <option key={opt} value={opt}>{opt}</option>
+             ))}
+           </select>
+         ) : (
+           <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+             {formData.english_level || 'غير محدد'}
+           </div>
+         )}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">مستوى اللغة العربية</label>
+         {isEditing ? (
+           <select
+             name="arabic_level"
+             value={editFormData.arabic_level || ''}
+             onChange={handleInputChange}
+             className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
+           >
+             <option value="">اختر</option>
+             {REFERENCE_DATA.languageLevels.map(opt => (
+               <option key={opt} value={opt}>{opt}</option>
+             ))}
+           </select>
+         ) : (
+           <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+             {formData.arabic_level || 'غير محدد'}
+           </div>
+         )}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">مستوى اللغة الإسبانية</label>
+         {isEditing ? (
+           <select
+             name="spanish_level"
+             value={editFormData.spanish_level || ''}
+             onChange={handleInputChange}
+             className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
+           >
+             <option value="">اختر</option>
+             {REFERENCE_DATA.languageLevels.map(opt => (
+               <option key={opt} value={opt}>{opt}</option>
+             ))}
+           </select>
+         ) : (
+           <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+             {formData.spanish_level || 'غير محدد'}
+           </div>
+         )}
+       </div>
+     </div>
+     
+     {/* Training Courses */}
+     <div>
+       <label className="block text-sm font-medium text-gray-700">الدورات التدريبية</label>
+       {isEditing ? (
+         <div>
+           {(editFormData.training_courses || []).map((course, idx) => (
+             <div key={idx} className="flex gap-2 mb-2">
+               <input
+                 type="text"
+                 value={course}
+                 onChange={e => {
+                   const updated = [...editFormData.training_courses];
+                   updated[idx] = e.target.value;
+                   setEditFormData({ ...editFormData, training_courses: updated });
+                 }}
+                 className="flex-1 p-2 border rounded"
+               />
+               <button 
+                 type="button" 
+                 onClick={() => {
+                   const updated = [...editFormData.training_courses];
+                   updated.splice(idx, 1);
+                   setEditFormData({ ...editFormData, training_courses: updated });
+                 }} 
+                 className="p-1 text-red-500 rounded bg-red-50 hover:bg-red-100"
+               >
+                 <Trash size={18} />
+               </button>
+             </div>
+           ))}
+           <button 
+             type="button" 
+             onClick={() => setEditFormData({ 
+               ...editFormData, 
+               training_courses: [...(editFormData.training_courses || []), ''] 
+             })} 
+             className="flex items-center mt-2 text-blue-600 hover:text-blue-700"
+           >
+             <Plus size={16} className="mr-1" /> إضافة دورة
+           </button>
+         </div>
+       ) : (
+         <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+           {(formData.training_courses || []).length === 0 ? 
+             'لا توجد دورات' : 
+             formData.training_courses.map((course, idx) => (
+               <div key={idx} className="py-1">
+                 {idx + 1}. {course}
+               </div>
+             ))
+           }
+         </div>
+       )}
+     </div>
+   </div>
+ );
 
-  // Render Medical Record Section
-  const renderMedicalRecord = () => (
-    <div className="space-y-6">
-      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">السجل الطبي</h2>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">فصيلة الدم</label>
-          {isEditing ? (
-            <select
-              name="blood_type"
-              value={editFormData.blood_type || ''}
-              onChange={handleInputChange}
-              className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
-            >
-              <option value="">اختر</option>
-              {REFERENCE_DATA.bloodTypes.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          ) : (
-            <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-              {formData.blood_type || 'غير محدد'}
-            </div>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">الطول (سم)</label>
-          {renderField('height', 'number')}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">الوزن (كجم)</label>
-          {renderField('weight', 'number')}
-        </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">الأمراض المزمنة</label>
-        {renderTextarea('chronic_details')}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">الإصابات السابقة</label>
-        {renderTextarea('injuries')}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">الحساسية</label>
-        {renderTextarea('allergies')}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">ملاحظات طبية أخرى</label>
-        {renderTextarea('medical_notes')}
-      </div>
-    </div>
-  );
+ // Render Medical Record Section
+ const renderMedicalRecord = () => (
+   <div className="space-y-6">
+     <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">السجل الطبي</h2>
+     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+       <div>
+         <label className="block text-sm font-medium text-gray-700">فصيلة الدم</label>
+         {isEditing ? (
+           <select
+             name="blood_type"
+             value={editFormData.blood_type || ''}
+             onChange={handleInputChange}
+             className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
+           >
+             <option value="">اختر</option>
+             {REFERENCE_DATA.bloodTypes.map(opt => (
+               <option key={opt} value={opt}>{opt}</option>
+             ))}
+           </select>
+         ) : (
+           <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+             {formData.blood_type || 'غير محدد'}
+           </div>
+         )}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">الطول (سم)</label>
+         {renderField('height', 'number')}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">الوزن (كجم)</label>
+         {renderField('weight', 'number')}
+       </div>
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">الأمراض المزمنة</label>
+       {renderTextarea('chronic_details')}
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">الإصابات السابقة</label>
+       {renderTextarea('injuries')}
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">الحساسية</label>
+       {renderTextarea('allergies')}
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">ملاحظات طبية أخرى</label>
+       {renderTextarea('medical_notes')}
+     </div>
+   </div>
+ );
 
-  // Render Sports Info Section
-  const renderSportsInfo = () => (
-    <div className="space-y-6">
-      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المعلومات الرياضية</h2>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">المركز الأساسي</label>
-          {isEditing ? (
-            <select
-              name="primary_position"
-              value={editFormData.primary_position || ''}
-              onChange={handleInputChange}
-              className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
-            >
-              <option value="">اختر</option>
-              {REFERENCE_DATA.positions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          ) : (
-            <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-              {formData.primary_position || 'غير محدد'}
-            </div>
-          )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">المركز الثانوي</label>
-          {isEditing ? (
-            <select
-              name="secondary_position"
-              value={editFormData.secondary_position || ''}
-              onChange={handleInputChange}
-              className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
-            >
-              <option value="">اختر</option>
-              {REFERENCE_DATA.positions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          ) : (
-            <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-              {formData.secondary_position || 'غير محدد'}
-            </div>
-          )}
-        </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">القدم المفضلة</label>
-        {isEditing ? (
-          <select
-            name="preferred_foot"
-            value={editFormData.preferred_foot || ''}
-            onChange={handleInputChange}
-            className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
-          >
-            <option value="">اختر</option>
-            {REFERENCE_DATA.footPreferences.map(opt => (
-              <option key={opt} value={opt}>{opt}</option>
-            ))}
-          </select>
-        ) : (
-          <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-            {formData.preferred_foot || 'غير محدد'}
-          </div>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">الأندية السابقة</label>
-        {renderTextarea('previous_clubs')}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">عدد سنوات الخبرة</label>
-        {renderField('experience_years', 'number')}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">ملاحظات رياضية أخرى</label>
-        {renderTextarea('sports_notes')}
-      </div>
-    </div>
-  );
-  // Render Skills Section
-  const renderSkills = () => (
-    <div className="space-y-8">
-      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المهارات والقدرات</h2>
-      <div>skills placeholder</div>
-    </div>
-  );
+ // Render Sports Info Section
+ const renderSportsInfo = () => (
+   <div className="space-y-6">
+     <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المعلومات الرياضية</h2>
+     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+       <div>
+         <label className="block text-sm font-medium text-gray-700">المركز الأساسي</label>
+         {isEditing ? (
+           <select
+             name="primary_position"
+             value={editFormData.primary_position || ''}
+             onChange={handleInputChange}
+             className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
+           >
+             <option value="">اختر</option>
+             {REFERENCE_DATA.positions.map(opt => (
+               <option key={opt} value={opt}>{opt}</option>
+             ))}
+           </select>
+         ) : (
+           <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+             {formData.primary_position || 'غير محدد'}
+           </div>
+         )}
+       </div>
+       <div>
+         <label className="block text-sm font-medium text-gray-700">المركز الثانوي</label>
+         {isEditing ? (
+           <select
+             name="secondary_position"
+             value={editFormData.secondary_position || ''}
+             onChange={handleInputChange}
+             className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
+           >
+             <option value="">اختر</option>
+             {REFERENCE_DATA.positions.map(opt => (
+               <option key={opt} value={opt}>{opt}</option>
+             ))}
+           </select>
+         ) : (
+           <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+             {formData.secondary_position || 'غير محدد'}
+           </div>
+         )}
+       </div>
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">القدم المفضلة</label>
+       {isEditing ? (
+         <select
+           name="preferred_foot"
+           value={editFormData.preferred_foot || ''}
+           onChange={handleInputChange}
+           className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
+         >
+           <option value="">اختر</option>
+           {REFERENCE_DATA.footPreferences.map(opt => (
+             <option key={opt} value={opt}>{opt}</option>
+           ))}
+         </select>
+       ) : (
+         <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
+           {formData.preferred_foot || 'غير محدد'}
+         </div>
+       )}
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">الأندية السابقة</label>
+       {renderTextarea('previous_clubs')}
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">عدد سنوات الخبرة</label>
+       {renderField('experience_years', 'number')}
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">ملاحظات رياضية أخرى</label>
+       {renderTextarea('sports_notes')}
+     </div>
+   </div>
+ );
+ // Render Skills Section
+ const renderSkills = () => (
+   <div className="space-y-8">
+     <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المهارات والقدرات</h2>
+     <div>skills placeholder</div>
+   </div>
+ );
 
-  // Render Objectives Section
-  const renderObjectives = () => (
-    <div className="space-y-6">
-      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">الأهداف والطموحات</h2>
-      <div>objectives placeholder</div>
-    </div>
-  );
+ // Render Objectives Section
+ const renderObjectives = () => (
+   <div className="space-y-6">
+     <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">الأهداف والطموحات</h2>
+     <div>objectives placeholder</div>
+   </div>
+ );
 
-  // Render Media Section
-  const renderMedia = () => (
-    <div className="space-y-6">
-      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">الصور والفيديوهات</h2>
-      <div>media placeholder</div>
-    </div>
-  );
-  
-  
-  // Main Component Return
-  console.log('PlayerProfile: Rendering main form');
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir="rtl">
-      {/* Loading Overlay */}
-      {submitting && <LoadingSpinner />}
+ // Render Media Section
+ const renderMedia = () => (
+   <div className="space-y-6">
+     <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">الصور والفيديوهات</h2>
+     <div>media placeholder</div>
+   </div>
+ );
+ 
+ 
+ // Main Component Return
+ console.log('PlayerProfile: Rendering main form');
+ return (
+   <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir="rtl">
+     {/* Loading Overlay */}
+     {submitting && <LoadingSpinner />}
 
-      {/* Success Message */}
-      {successMessage && <SuccessMessage message={successMessage} />}
+     {/* Success Message */}
+     {successMessage && <SuccessMessage message={successMessage} />}
 
-      <header className="py-6 text-white bg-gradient-to-r from-blue-600 to-blue-800">
-        <div className="container px-4 mx-auto">
-          <h1 className="text-3xl font-bold text-center">نموذج تسجيل لاعب كرة القدم</h1>
-          {user && (
-            <p className="mt-2 text-center text-blue-100">
-              مرحباً {user.email}
-            </p>
-          )}
-        </div>
-      </header>
+     <header className="py-6 text-white bg-gradient-to-r from-blue-600 to-blue-800">
+       <div className="container px-4 mx-auto">
+         <h1 className="text-3xl font-bold text-center">نموذج تسجيل لاعب كرة القدم</h1>
+         {user && (
+           <p className="mt-2 text-center text-blue-100">
+             مرحباً {user.email}
+           </p>
+         )}
+       </div>
+     </header>
 
-      <main className="container px-4 py-8 mx-auto">
-        {formErrors.submit && <ErrorMessage message={formErrors.submit} />}
+     <main className="container px-4 py-8 mx-auto">
+       {formErrors.submit && <ErrorMessage message={formErrors.submit} />}
 
-        <form onSubmit={handleSubmit} className="p-6 bg-white rounded-lg shadow-lg">
-          {/* Progress Steps */}
-          <ProgressSteps />
+       <form className="p-6 bg-white rounded-lg shadow-lg">
+         {/* Progress Steps */}
+         <div className="mb-8">
+           {/* Progress Steps Content */}
+         </div>
 
-          {/* Form Sections */}
-          {currentStep === STEPS.PERSONAL && renderPersonalInfo()}
-          {currentStep === STEPS.EDUCATION && renderEducation()}
-          {currentStep === STEPS.MEDICAL && renderMedicalRecord()}
-          {currentStep === STEPS.SPORTS && renderSportsInfo()}
-          {currentStep === STEPS.SKILLS && renderSkills()}
-          {currentStep === STEPS.OBJECTIVES && renderObjectives()}
-          {currentStep === STEPS.MEDIA && renderMedia()}
+         {/* Form Sections */}
+         {currentStep === STEPS.PERSONAL && renderPersonalInfo()}
+         {currentStep === STEPS.EDUCATION && renderEducation()}
+         {currentStep === STEPS.MEDICAL && renderMedicalRecord()}
+         {currentStep === STEPS.SPORTS && renderSportsInfo()}
+         {currentStep === STEPS.SKILLS && renderSkills()}
+         {currentStep === STEPS.OBJECTIVES && renderObjectives()}
+         {currentStep === STEPS.MEDIA && renderMedia()}
 
-          {/* Navigation Buttons */}
-          <NavigationButtons />
-        </form>
-      </main>
+         {/* Navigation Buttons */}
+         <div className="flex justify-between mt-8">
+           {/* Navigation Buttons Content */}
+         </div>
+       </form>
+     </main>
 
-      {/* Footer */}
-      <footer className="py-8 mt-12 text-white bg-gray-800">
-        <div className="container px-4 mx-auto">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div>
-              <h3 className="mb-4 text-lg font-semibold">روابط مهمة</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-blue-400">الشروط والأحكام</a></li>
-                <li><a href="#" className="hover:text-blue-400">سياسة الخصوصية</a></li>
-                <li><a href="#" className="hover:text-blue-400">الأسئلة الشائعة</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-4 text-lg font-semibold">تواصل معنا</h3>
-              <ul className="space-y-2">
-                <li>البريد الإلكتروني: support@example.com</li>
-                <li>الهاتف: +966 55 555 5555</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="mb-4 text-lg font-semibold">تابعنا</h3>
-              <div className="flex space-x-4">
-                {/* Add social media icons/links here */}
-              </div>
-            </div>
-          </div>
-          <div className="pt-8 mt-8 text-center border-t border-gray-700">
-            <p>&copy; {new Date().getFullYear()} جميع الحقوق محفوظة</p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-};
+     {/* Footer */}
+     <footer className="py-8 mt-12 text-white bg-gray-800">
+       <div className="container px-4 mx-auto">
+         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+           <div>
+             <h3 className="mb-4 text-lg font-semibold">روابط مهمة</h3>
+             <ul className="space-y-2">
+               <li><a href="#" className="hover:text-blue-400">الشروط والأحكام</a></li>
+               <li><a href="#" className="hover:text-blue-400">سياسة الخصوصية</a></li>
+               <li><a href="#" className="hover:text-blue-400">الأسئلة الشائعة</a></li>
+             </ul>
+           </div>
+           <div>
+             <h3 className="mb-4 text-lg font-semibold">تواصل معنا</h3>
+             <ul className="space-y-2">
+               <li>البريد الإلكتروني: support@example.com</li>
+               <li>الهاتف: +966 55 555 5555</li>
+             </ul>
+           </div>
+           <div>
+             <h3 className="mb-4 text-lg font-semibold">تابعنا</h3>
+             <div className="flex space-x-4">
+               {/* Add social media icons/links here */}
+             </div>
+           </div>
+         </div>
+         <div className="pt-8 mt-8 text-center border-t border-gray-700">
+           <p>&copy; {new Date().getFullYear()} جميع الحقوق محفوظة</p>
+         </div>
+       </div>
+     </footer>
+   </div>
+ );
+}
 
 // Phone icon component
 const Phone = (props) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    {...props}
-  >
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-  </svg>
+ <svg 
+   xmlns="http://www.w3.org/2000/svg" 
+   width="24" 
+   height="24" 
+   viewBox="0 0 24 24" 
+   fill="none" 
+   stroke="currentColor" 
+   strokeWidth="2" 
+   strokeLinecap="round" 
+   strokeLinejoin="round" 
+   {...props}
+ >
+   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+ </svg>
 );
 
 // FileText icon component
 const FileText = (props) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width="24" 
-    height="24" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    {...props}
-  >
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-    <polyline points="14 2 14 8 20 8"></polyline>
-    <line x1="16" y1="13" x2="8" y2="13"></line>
-    <line x1="16" y1="17" x2="8" y2="17"></line>
-    <polyline points="10 9 9 9 8 9"></polyline>
-  </svg>
+ <svg 
+   xmlns="http://www.w3.org/2000/svg" 
+   width="24" 
+   height="24" 
+   viewBox="0 0 24 24" 
+   fill="none" 
+   stroke="currentColor" 
+   strokeWidth="2" 
+   strokeLinecap="round" 
+   strokeLinejoin="round" 
+   {...props}
+ >
+   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+   <polyline points="14 2 14 8 20 8"></polyline>
+   <line x1="16" y1="13" x2="8" y2="13"></line>
+   <line x1="16" y1="17" x2="8" y2="17"></line>
+   <polyline points="10 9 9 9 8 9"></polyline>
+ </svg>
+);
+
+// Error Message Component (missing from original)
+const ErrorMessage = ({ message }) => (
+ <div className="p-4 mb-4 bg-red-100 border border-red-400 rounded-md">
+   <div className="flex items-center">
+     <X className="w-5 h-5 mr-2 text-red-500" />
+     <p className="text-red-700">{message}</p>
+   </div>
+ </div>
 );

@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    experimental: {
+        serverActions: true,
+        serverComponentsExternalPackages: ['@supabase/auth-helpers-nextjs', '@supabase/supabase-js'],
+    },
   images: {
     domains: [
       'ekyerljzfokqimbabzxm.supabase.co',
@@ -20,4 +24,6 @@ const nextConfig = {
   }
 }
 
-module.exports = nextConfig
+module.exports = nextConfig;
+// This configuration file sets up Next.js with experimental features, image domains, environment variables for Azure storage, and other optimizations.
+// It also enables React's strict mode and SWC minification for better performance.
