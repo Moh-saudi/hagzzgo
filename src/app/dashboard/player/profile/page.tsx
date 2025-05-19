@@ -166,40 +166,53 @@ const ProgressSteps: React.FC<ProgressStepsProps> = ({ currentStep }) => {
   );
 };
 
-// Navigation Buttons Component
-const NavigationButtons = ({ currentStep, setCurrentStep, submitting }) => (
-  <div className="flex justify-between mt-8">
-    {currentStep > 1 && (
-      <Button
-        type="button"
-        onClick={() => setCurrentStep(prev => prev - 1)}
-        className="flex items-center"
-      >
-        <ChevronRight className="ml-2" />
-        السابق
-      </Button>
-    )}
-    {currentStep < Object.keys(STEP_TITLES).length ? (
-      <Button
-        type="button"
-        onClick={() => setCurrentStep(prev => prev + 1)}
-        className="flex items-center"
-      >
-        التالي
-        <ChevronLeft className="mr-2" />
-      </Button>
-    ) : (
-      <Button
-        type="submit"
-        disabled={submitting}
-        className="flex items-center"
-      >
-        {submitting ? 'جاري الحفظ...' : 'حفظ البيانات'}
-        <Check className="mr-2" />
-      </Button>
-    )}
-  </div>
-);
+// Define interfaces for props
+interface NavigationButtonsProps {
+  currentStep: number;
+  setCurrentStep: (step: number | ((prev: number) => number)) => void;
+  submitting: boolean;
+}
+
+// Update component with proper type annotations
+const NavigationButtons: React.FC<NavigationButtonsProps> = ({ 
+  currentStep, 
+  setCurrentStep, 
+  submitting 
+}) => {
+  return (
+    <div className="flex justify-between mt-8">
+      {currentStep > 1 && (
+        <Button
+          type="button"
+          onClick={() => setCurrentStep(prev => prev - 1)}
+          className="flex items-center"
+        >
+          <ChevronRight className="ml-2" />
+          السابق
+        </Button>
+      )}
+      {currentStep < Object.keys(STEP_TITLES).length ? (
+        <Button
+          type="button"
+          onClick={() => setCurrentStep(prev => prev + 1)}
+          className="flex items-center"
+        >
+          التالي
+          <ChevronLeft className="mr-2" />
+        </Button>
+      ) : (
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="flex items-center"
+        >
+          {submitting ? 'جاري الحفظ...' : 'حفظ البيانات'}
+          <Check className="mr-2" />
+        </Button>
+      )}
+    </div>
+  );
+};
 
 // Helper function to combine classes
 function classNames(...classes) {
