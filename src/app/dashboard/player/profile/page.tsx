@@ -57,9 +57,15 @@ interface PlayerState {
   height: string;
   weight: string;
   chronic_details: string;
+  injuries: string;
+  allergies: string;
+  medical_notes: string;
   primary_position: string;
   secondary_position: string;
   preferred_foot: string;
+  previous_clubs: string;
+  experience_years: string;
+  sports_notes: string;
   technical_skills: Record<string, unknown>;
   physical_skills: Record<string, unknown>;
   social_skills: Record<string, unknown>;
@@ -68,6 +74,8 @@ interface PlayerState {
   additional_images: Array<{ url: string }>;
   videos: Array<string>;
   training_courses: Array<string>;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 interface FormErrors {
@@ -80,36 +88,9 @@ interface FormErrors {
   [key: string]: string | undefined;
 }
 
-interface PlayerFormData {
-  full_name: string;
+interface PlayerFormData extends Omit<PlayerState, 'birth_date'> {
   birth_date: string | null;
-  nationality: string;
-  city: string;
-  country: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
-  brief: string;
-  education_level: string;
-  graduation_year: string;
-  english_level: string;
-  arabic_level: string;
-  spanish_level: string;
-  blood_type: string;
-  height: string;
-  weight: string;
-  chronic_details: string;
-  primary_position: string;
-  secondary_position: string;
-  preferred_foot: string;
-  technical_skills: Record<string, unknown>;
-  physical_skills: Record<string, unknown>;
-  social_skills: Record<string, unknown>;
-  objectives: Record<string, unknown>;
-  profile_image: null | { url: string };
-  additional_images: Array<{ url: string }>;
-  videos: Array<string>;
-  training_courses: Array<string>;
+  updated_at?: Date;
 }
 
 // Constants
@@ -217,6 +198,44 @@ export default function PlayerProfile() {
   const [isLoading, setIsLoading] = useState(true);
   const [playerData, setPlayerData] = useState<PlayerState | null>(null);
   const [formData, setFormData] = useState<PlayerFormData>({
+      full_name: '',
+      birth_date: null,
+      nationality: '',
+      city: '',
+      country: '',
+      phone: '',
+      whatsapp: '',
+      email: '',
+      brief: '',
+      education_level: '',
+      graduation_year: '',
+      english_level: '',
+      arabic_level: '',
+      spanish_level: '',
+      blood_type: '',
+      height: '',
+      weight: '',
+      chronic_details: '',
+      injuries: '',
+      allergies: '',
+      medical_notes: '',
+      primary_position: '',
+      secondary_position: '',
+      preferred_foot: '',
+      previous_clubs: '',
+      experience_years: '',
+      sports_notes: '',
+      technical_skills: {},
+      physical_skills: {},
+      social_skills: {},
+      objectives: {},
+      profile_image: null,
+      additional_images: [],
+      videos: [],
+      training_courses: [],
+    });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState<PlayerFormData>({
     full_name: '',
     birth_date: null,
     nationality: '',
@@ -235,9 +254,15 @@ export default function PlayerProfile() {
     height: '',
     weight: '',
     chronic_details: '',
+    injuries: '',
+    allergies: '',
+    medical_notes: '',
     primary_position: '',
     secondary_position: '',
     preferred_foot: '',
+    previous_clubs: '',
+    experience_years: '',
+    sports_notes: '',
     technical_skills: {},
     physical_skills: {},
     social_skills: {},
@@ -247,12 +272,10 @@ export default function PlayerProfile() {
     videos: [],
     training_courses: [],
   });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editFormData, setEditFormData] = useState({});
   const [editError, setEditError] = useState('');
   const [editLoading, setEditLoading] = useState(false);
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
-  const [uploadingAdditionalImages, setUploadingAdditionalImages] = useState({});
+  const [uploadingAdditionalImages, setUploadingAdditionalImages] = useState<Record<string, boolean>>({});
 
   console.log('PlayerProfile: state initialized', { isLoading, playerData, formData });
 
@@ -429,12 +452,80 @@ export default function PlayerProfile() {
         let additionalImagesUrls = data.additional_image_urls || [];
         
         // دمج البيانات
-        const mergedData = {
+        interface MergedData extends PlayerState {
+          birth_date: string;
+          profile_image: { url: string } | null;
+          additional_images: Array<{ url: string }>;
+        }
+
+        interface FirestoreData extends Omit<PlayerState, 'birth_date' | 'profile_image' | 'additional_images'> {
+          birth_date: { toDate(): Date };
+          profile_image_url?: string;
+          additional_image_urls?: string[];
+        }
+
+        interface MergedData extends PlayerState {
+          birth_date: string;
+          profile_image: { url: string } | null;
+          additional_images: Array<{ url: string }>;
+        }
+
+        interface FirestoreData extends Omit<PlayerState, 'birth_date' | 'profile_image' | 'additional_images'> {
+          birth_date: { toDate(): Date };
+          profile_image_url?: string;
+          additional_image_urls?: string[];
+        }
+
+        interface BasePlayerData {
+          // Base fields from defaultPlayerFields
+          full_name: string;
+          nationality: string;
+          city: string;
+          country: string;
+          phone: string;
+          whatsapp: string;
+          email: string;
+          brief: string;
+          education_level: string;
+          graduation_year: string;
+          english_level: string;
+          arabic_level: string;
+          spanish_level: string;
+          blood_type: string;
+          height: string;
+          weight: string;
+          chronic_details: string;
+          primary_position: string;
+          secondary_position: string;
+          preferred_foot: string;
+          technical_skills: Record<string, unknown>;
+          physical_skills: Record<string, unknown>;
+          social_skills: Record<string, unknown>;
+          objectives: Record<string, unknown>;
+        }
+
+        interface ImageData {
+          url: string;
+        }
+
+        interface FirestoreData extends BasePlayerData {
+          birth_date: { toDate(): Date };
+          profile_image_url?: string;
+          additional_image_urls?: string[];
+        }
+
+        interface MergedData extends BasePlayerData {
+          birth_date: string;
+          profile_image: ImageData | null;
+          additional_images: ImageData[];
+        }
+
+        const mergedData: MergedData = {
           ...defaultPlayerFields,
-          ...data,
+          ...(data as FirestoreData),
           birth_date: data.birth_date ? new Date(data.birth_date.toDate()).toISOString().split('T')[0] : '',
           profile_image: profileImageUrl ? { url: profileImageUrl } : null,
-          additional_images: additionalImagesUrls.map(url => ({ url })),
+          additional_images: additionalImagesUrls.map((url: string) => ({ url })),
         };
         
         console.log("Merged player data:", mergedData);
@@ -444,8 +535,15 @@ export default function PlayerProfile() {
       } else {
         console.log("No player data found in Firestore");
         // إذا لم يتم العثور على بيانات، قم بإنشاء وثيقة جديدة
-        const newPlayerData = {
+        const newPlayerData: PlayerState = {
           ...defaultPlayerFields,
+          injuries: '',
+          allergies: '',
+          medical_notes: '',
+          previous_clubs: '',
+          experience_years: '',
+          sports_notes: '',
+          birth_date: null,
           created_at: new Date(),
           updated_at: new Date(),
         };
@@ -495,13 +593,13 @@ export default function PlayerProfile() {
       const additionalImageUrls = editFormData.additional_images?.map(img => img.url) || [];
       
       // تهيئة الكائن الذي سيتم حفظه في Firestore
-      const playerDataToSave = {
+      const playerDataToSave: Partial<typeof editFormData> = {
         ...editFormData,
-        profile_image_url: profileImageUrl,
-        additional_image_urls: additionalImageUrls,
+        profile_image: profileImageUrl ? { url: profileImageUrl } : null,
+        additional_images: additionalImageUrls.map(url => ({ url })),
         
         // تحويل التاريخ إلى كائن تاريخ لـ Firestore إذا كان موجودًا
-        birth_date: editFormData.birth_date ? new Date(editFormData.birth_date) : null,
+        birth_date: editFormData.birth_date ? editFormData.birth_date : null,
         
         // إضافة طابع زمني للتحديث
         updated_at: new Date(),
@@ -670,13 +768,14 @@ export default function PlayerProfile() {
       <input
         type={type}
         name={name}
-        value={editFormData[name] || ''}
+        value={typeof editFormData[name] === 'string' ? editFormData[name] as string : ''}
         onChange={handleInputChange}
         className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
       />
     ) : (
       <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-        {formData[name] || 'غير محدد'}
+        {typeof formData[name] === 'string' ? formData[name] as string : 
+         typeof formData[name] === 'object' ? JSON.stringify(formData[name]) : 'غير محدد'}
       </div>
     );
 
@@ -685,13 +784,15 @@ export default function PlayerProfile() {
     isEditing ? (
       <textarea
         name={name}
-        value={editFormData[name] || ''}
+        value={typeof editFormData[name] === 'string' ? editFormData[name] as string : ''}
         onChange={handleInputChange}
         className="w-full p-2 mt-1 text-gray-900 bg-white border rounded-md"
       />
     ) : (
       <div className="p-2 mt-1 text-gray-900 bg-gray-100 rounded-md">
-        {formData[name] || 'غير محدد'}
+        {typeof formData[name] === 'string' ? formData[name] as string :
+         typeof formData[name] === 'object' ? JSON.stringify(formData[name]) :
+         'غير محدد'}
       </div>
     );
 
@@ -1203,7 +1304,11 @@ export default function PlayerProfile() {
 }
 
 // Phone icon component
-const Phone = (props) => (
+interface PhoneIconProps extends React.SVGProps<SVGSVGElement> {
+  // Extends built-in SVG props
+}
+
+const Phone = (props: React.SVGProps<SVGSVGElement>) => (
  <svg 
    xmlns="http://www.w3.org/2000/svg" 
    width="24" 
@@ -1220,8 +1325,9 @@ const Phone = (props) => (
  </svg>
 );
 
+
 // FileText icon component
-const FileText = (props) => (
+const FileText = (props: React.SVGProps<SVGSVGElement>) => (
  <svg 
    xmlns="http://www.w3.org/2000/svg" 
    width="24" 
@@ -1243,7 +1349,7 @@ const FileText = (props) => (
 );
 
 // Error Message Component (missing from original)
-const ErrorMessage = ({ message }) => (
+const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
  <div className="p-4 mb-4 bg-red-100 border border-red-400 rounded-md">
    <div className="flex items-center">
      <X className="w-5 h-5 mr-2 text-red-500" />

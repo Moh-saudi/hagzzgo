@@ -25,6 +25,9 @@ import { Alert, AlertTitle } from '@/components/ui/alert';
 import { createClient } from '@supabase/supabase-js';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
+import ReactPlayer from 'react-player/lazy';
+import html2canvas from 'html2canvas';
+
 
 // Make sure this import is at the end of your imports
 import '../../../globals.css';

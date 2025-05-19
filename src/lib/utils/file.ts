@@ -1,5 +1,7 @@
 // src/lib/utils/file.ts
 
+import { supabase } from '@/lib/supabase/config';
+
 export const allowedFileTypes = {
   images: ['image/jpeg', 'image/png', 'image/webp'],
   documents: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
@@ -41,10 +43,44 @@ export const handleFileUpload = async (
   if (!validateFile(file, type)) return null;
 
   try {
-    const url = await uploadFileToAzure(file);
+    const url = await uploadFile(file);
     return url;
   } catch (error) {
     console.error('❌ خطأ في رفع الملف:', error);
     return null;
   }
 };
+
+/**
+ * Mock implementation of file upload that uses Supabase instead
+ */
+export async function uploadFile(file: File): Promise<string> {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `uploads/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('player-files')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = await supabase.storage
+      .from('player-files')
+      .getPublicUrl(filePath);
+
+    return data?.publicUrl || '';
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+}
+
+/**
+ * @deprecated Use Supabase storage instead
+ */
+export async function uploadFileToAzure(): Promise<string> {
+  console.warn('⚠️ Azure Storage is disabled. Using Supabase storage instead.');
+  return Promise.reject('Azure Storage is disabled - Use Supabase storage');
+}
