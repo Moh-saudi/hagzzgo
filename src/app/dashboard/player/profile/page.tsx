@@ -1077,18 +1077,69 @@ const uploadWalletDocument = async (
     </div>
   );
   // Render Skills Section
-  const renderSkills = () => {
-    return (
-      <div className="space-y-8">
-        <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المهارات والقدرات</h2>
-        
-        {/* Technical Skills */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+  const renderSkills = () => (
+    <div className="space-y-8">
+      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المهارات والقدرات</h2>
+      
+      {/* Technical Skills */}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        {[
+          { key: 'ball_control', label: 'التحكم بالكرة' },
+          { key: 'passing', label: 'التمرير' },
+          { key: 'shooting', label: 'التسديد' },
+          { key: 'dribbling', label: 'المراوغة' }
+        ].map(skill => (
+          <div key={skill.key}>
+            <div className="flex justify-between mb-1 text-sm text-gray-600">
+              <span>{skill.label}</span>
+              <span>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={editFormData.technical_skills?.[skill.key] || ''}
+                    onChange={e => {
+                      setEditFormData(prev => ({
+                        ...prev,
+                        technical_skills: {
+                          ...prev.technical_skills,
+                          [skill.key]: e.target.value
+                        }
+                      }));
+                    }}
+                    className="w-16 p-1 border rounded"
+                  />
+                ) : (
+                  (formData.technical_skills?.[skill.key] || 'غير محدد') + '/5'
+                )}
+              </span>
+            </div>
+            <div className="w-full h-2 bg-gray-200 rounded-lg">
+              <div
+                className="h-full bg-blue-600 rounded-lg"
+                style={{ 
+                  width: `${((isEditing 
+                    ? editFormData.technical_skills?.[skill.key] 
+                    : formData.technical_skills?.[skill.key]) || 0) * 20}%` 
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Physical Skills */}
+      <div>
+        <h3 className="mb-4 text-lg font-medium">المهارات البدنية</h3>
+        <div className="space-y-4">
           {[
-            { key: 'ball_control', label: 'التحكم بالكرة' },
-            { key: 'passing', label: 'التمرير' },
-            { key: 'shooting', label: 'التسديد' },
-            { key: 'dribbling', label: 'المراوغة' }
+            { key: 'speed', label: 'السرعة' },
+            { key: 'strength', label: 'القوة البدنية' },
+            { key: 'stamina', label: 'التحمل' },
+            { key: 'agility', label: 'الرشاقة' },
+            { key: 'balance', label: 'التوازن' },
+            { key: 'flexibility', label: 'المرونة' }
           ].map(skill => (
             <div key={skill.key}>
               <div className="flex justify-between mb-1 text-sm text-gray-600">
@@ -1099,12 +1150,12 @@ const uploadWalletDocument = async (
                       type="number"
                       min="1"
                       max="5"
-                      value={editFormData.technical_skills?.[skill.key] || ''}
+                      value={editFormData.physical_skills?.[skill.key] || ''}
                       onChange={e => {
                         setEditFormData(prev => ({
                           ...prev,
-                          technical_skills: {
-                            ...prev.technical_skills,
+                          physical_skills: {
+                            ...prev.physical_skills,
                             [skill.key]: e.target.value
                           }
                         }));
@@ -1112,162 +1163,109 @@ const uploadWalletDocument = async (
                       className="w-16 p-1 border rounded"
                     />
                   ) : (
-                    (formData.technical_skills?.[skill.key] || 'غير محدد') + '/5'
+                    (formData.physical_skills?.[skill.key] || 'غير محدد') + '/5'
                   )}
                 </span>
               </div>
               <div className="w-full h-2 bg-gray-200 rounded-lg">
                 <div
-                  className="h-full bg-blue-600 rounded-lg"
+                  className="h-full bg-green-600 rounded-lg"
                   style={{ 
                     width: `${((isEditing 
-                      ? editFormData.technical_skills?.[skill.key] 
-                      : formData.technical_skills?.[skill.key]) || 0) * 20}%` 
+                      ? editFormData.physical_skills?.[skill.key] 
+                      : formData.physical_skills?.[skill.key]) || 0) * 20}%` 
                   }}
                 />
               </div>
             </div>
           ))}
         </div>
-        
-        {/* Physical Skills */}
-        <div>
-          <h3 className="mb-4 text-lg font-medium">المهارات البدنية</h3>
-          <div className="space-y-4">
-            {[
-              { key: 'speed', label: 'السرعة' },
-              { key: 'strength', label: 'القوة البدنية' },
-              { key: 'stamina', label: 'التحمل' },
-              { key: 'agility', label: 'الرشاقة' },
-              { key: 'balance', label: 'التوازن' },
-              { key: 'flexibility', label: 'المرونة' }
-            ].map(skill => (
-              <div key={skill.key}>
-                <div className="flex justify-between mb-1 text-sm text-gray-600">
-                  <span>{skill.label}</span>
-                  <span>
-                    {isEditing ? (
-                      <input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={editFormData.physical_skills?.[skill.key] || ''}
-                        onChange={e => {
-                          setEditFormData(prev => ({
-                            ...prev,
-                            physical_skills: {
-                              ...prev.physical_skills,
-                              [skill.key]: e.target.value
-                            }
-                          }));
-                        }}
-                        className="w-16 p-1 border rounded"
-                      />
-                    ) : (
-                      (formData.physical_skills?.[skill.key] || 'غير محدد') + '/5'
-                    )}
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-lg">
-                  <div
-                    className="h-full bg-green-600 rounded-lg"
-                    style={{ 
-                      width: `${((isEditing 
-                        ? editFormData.physical_skills?.[skill.key] 
-                        : formData.physical_skills?.[skill.key]) || 0) * 20}%` 
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Social Skills */}
-        <div>
-          <h3 className="mb-4 text-lg font-medium">المهارات الاجتماعية</h3>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {[
-              { key: 'teamwork', label: 'العمل الجماعي' },
-              { key: 'communication', label: 'التواصل' },
-              { key: 'discipline', label: 'الانضباط' },
-              { key: 'self_confidence', label: 'الثقة بالنفس' },
-              { key: 'pressure_handling', label: 'تحمل الضغط' },
-              { key: 'punctuality', label: 'الالتزام بالمواعيد' }
-            ].map(skill => (
-              <div key={skill.key}>
-                <div className="flex justify-between mb-1 text-sm text-gray-600">
-                  <span>{skill.label}</span>
-                  <span>
-                    {isEditing ? (
-                      <input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={editFormData.social_skills?.[skill.key] || ''}
-                        onChange={e => {
-                          setEditFormData(prev => ({
-                            ...prev,
-                            social_skills: {
-                              ...prev.social_skills,
-                              [skill.key]: e.target.value
-                            }
-                          }));
-                        }}
-                        className="w-16 p-1 border rounded"
-                      />
-                    ) : (
-                      (formData.social_skills?.[skill.key] || 'غير محدد') + '/5'
-                    )}
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-lg">
-                  <div
-                    className="h-full bg-purple-600 rounded-lg"
-                    style={{ 
-                      width: `${((isEditing 
-                        ? editFormData.social_skills?.[skill.key] 
-                        : formData.social_skills?.[skill.key]) || 0) * 20}%` 
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Skill Radar Chart */}
-        {!isEditing && (
-          <div className="p-4 mt-8 bg-white rounded-lg shadow-md">
-            <h3 className="mb-4 text-lg font-medium text-center">مخطط المهارات</h3>
-            <div className="h-80">
-              <RadarChart
-                cx="50%"
-                cy="50%"
-                outerRadius="80%"
-                width={500}
-                height={300}
-                data={[
-                  { subject: 'التحكم بالكرة', A: formData.technical_skills?.ball_control || 0 },
-                  { subject: 'التمرير', A: formData.technical_skills?.passing || 0 },
-                  { subject: 'التسديد', A: formData.technical_skills?.shooting || 0 },
-                  { subject: 'المراوغة', A: formData.technical_skills?.dribbling || 0 },
-                  { subject: 'السرعة', A: formData.physical_skills?.speed || 0 },
-                  { subject: 'القوة', A: formData.physical_skills?.strength || 0 },
-                  { subject: 'التحمل', A: formData.physical_skills?.stamina || 0 }
-                ]}
-              >
-                <PolarGrid />
-                <PolarAngleAxis dataKey="subject" />
-                <PolarRadiusAxis angle={90} domain={[0, 5]} />
-                <Radar name="المهارات" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-              </RadarChart>
-            </div>
-          </div>
-        )}
       </div>
-    };
-  };
+      
+      {/* Social Skills */}
+      <div>
+        <h3 className="mb-4 text-lg font-medium">المهارات الاجتماعية</h3>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {[
+            { key: 'teamwork', label: 'العمل الجماعي' },
+            { key: 'communication', label: 'التواصل' },
+            { key: 'discipline', label: 'الانضباط' },
+            { key: 'self_confidence', label: 'الثقة بالنفس' },
+            { key: 'pressure_handling', label: 'تحمل الضغط' },
+            { key: 'punctuality', label: 'الالتزام بالمواعيد' }
+          ].map(skill => (
+            <div key={skill.key}>
+              <div className="flex justify-between mb-1 text-sm text-gray-600">
+                <span>{skill.label}</span>
+                <span>
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      min="1"
+                      max="5"
+                      value={editFormData.social_skills?.[skill.key] || ''}
+                      onChange={e => {
+                        setEditFormData(prev => ({
+                          ...prev,
+                          social_skills: {
+                            ...prev.social_skills,
+                            [skill.key]: e.target.value
+                          }
+                        }));
+                      }}
+                      className="w-16 p-1 border rounded"
+                    />
+                  ) : (
+                    (formData.social_skills?.[skill.key] || 'غير محدد') + '/5'
+                  )}
+                </span>
+              </div>
+              <div className="w-full h-2 bg-gray-200 rounded-lg">
+                <div
+                  className="h-full bg-purple-600 rounded-lg"
+                  style={{ 
+                    width: `${((isEditing 
+                      ? editFormData.social_skills?.[skill.key] 
+                      : formData.social_skills?.[skill.key]) || 0) * 20}%` 
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {/* Skill Radar Chart */}
+      {!isEditing && (
+        <div className="p-4 mt-8 bg-white rounded-lg shadow-md">
+          <h3 className="mb-4 text-lg font-medium text-center">مخطط المهارات</h3>
+          <div className="h-80">
+            <RadarChart
+              cx="50%"
+              cy="50%"
+              outerRadius="80%"
+              width={500}
+              height={300}
+              data={[
+                { subject: 'التحكم بالكرة', A: formData.technical_skills?.ball_control || 0 },
+                { subject: 'التمرير', A: formData.technical_skills?.passing || 0 },
+                { subject: 'التسديد', A: formData.technical_skills?.shooting || 0 },
+                { subject: 'المراوغة', A: formData.technical_skills?.dribbling || 0 },
+                { subject: 'السرعة', A: formData.physical_skills?.speed || 0 },
+                { subject: 'القوة', A: formData.physical_skills?.strength || 0 },
+                { subject: 'التحمل', A: formData.physical_skills?.stamina || 0 }
+              ]}
+            >
+              <PolarGrid />
+              <PolarAngleAxis dataKey="subject" />
+              <PolarRadiusAxis angle={90} domain={[0, 5]} />
+              <Radar name="المهارات" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+            </RadarChart>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   // Render Objectives Section
   const renderObjectives = () => (
