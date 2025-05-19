@@ -1618,7 +1618,7 @@ const uploadWalletDocument = async (
   );
 };
 
-// Add these type definitions for icon components
+// Add type definitions at the top
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;
 }
