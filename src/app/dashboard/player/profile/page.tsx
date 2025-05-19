@@ -14,8 +14,14 @@ import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "r
 // Supabase Client
 import { createClient } from '@supabase/supabase-js';
 
+// 1. إضافة تهيئة Supabase آمنة في بداية الملف
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Constants & Reference Data
@@ -443,13 +449,15 @@ export default function PlayerProfile() {
     
     setUploadingProfileImage(true);
     try {
-      const uploadedUrl = await uploadProfileImage(file, user.uid);
-      setEditFormData(prev => ({ 
-        ...prev, 
-        profile_image: { url: uploadedUrl } 
+      const path = `profiles/${user.uid}/${Date.now()}_${file.name}`;
+      const url = await handleImageUpload(file, 'player-images', path);
+      
+      setEditFormData(prev => ({
+        ...prev,
+        profile_image: { url }
       }));
     } catch (error) {
-      console.error("فشل في رفع صورة البروفايل:", error);
+      console.error('فشل في رفع صورة البروفايل:', error);
       setFormErrors(prev => ({
         ...prev,
         profileImage: 'فشل في رفع الصورة الشخصية'
@@ -460,24 +468,21 @@ export default function PlayerProfile() {
   };
   
   // File upload handler for additional images
-  const handleAdditionalImageUpload = async (e, idx) => {
+  const handleAdditionalImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    setUploadingAdditionalImages(prev => ({ ...prev, [idx]: true }));
+    setUploadingAdditionalImages(prev => ({ ...prev, new: true }));
     try {
-      const uploadedUrl = await uploadAdditionalImage(file, user.uid, idx);
+      const path = `additional/${user.uid}/${Date.now()}_${file.name}`;
+      const url = await handleImageUpload(file, 'player-images', path);
       
-      // تحديث المصفوفة بالعنصر الجديد
-      const updatedImages = [...editFormData.additional_images];
-      updatedImages[idx] = { url: uploadedUrl };
-      
-      setEditFormData(prev => ({ 
-        ...prev, 
-        additional_images: updatedImages
+      setEditFormData(prev => ({
+        ...prev,
+        additional_images: [...(prev.additional_images || []), { url }]
       }));
     } catch (error) {
-      console.error("فشل في رفع الصورة الإضافية:", error);
+      console.error('فشل في رفع الصورة الإضافية:', error);
       setFormErrors(prev => ({
         ...prev,
         additionalImage: 'فشل في رفع الصورة الإضافية'
@@ -485,7 +490,7 @@ export default function PlayerProfile() {
     } finally {
       setUploadingAdditionalImages(prev => {
         const updated = { ...prev };
-        delete updated[idx];
+        delete updated.new;
         return updated;
       });
     }
