@@ -1618,10 +1618,10 @@ const uploadWalletDocument = async (
   );
 };
 
-// Add the default export
+// Export the component
 export default PlayerProfilePage;
 
-// Add the icon components at the end of the file
+// Add icon components
 export const Phone = (props: React.SVGProps<SVGSVGElement>) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
