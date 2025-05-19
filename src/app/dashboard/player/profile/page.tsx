@@ -268,6 +268,12 @@ interface VideoItem {
   description: string;
 }
 
+// Add PlayerState interface
+interface PlayerState extends PlayerData {
+  created_at?: Date;
+  updated_at?: Date;
+}
+
 export default function PlayerProfile() {
   const router = useRouter();
   const [user, loading, error] = useAuthState(auth);
@@ -276,10 +282,10 @@ export default function PlayerProfile() {
   const [successMessage, setSuccessMessage] = useState('');
   const [formErrors, setFormErrors] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [playerData, setPlayerData] = useState(null);
-  const [formData, setFormData] = useState({ ...defaultPlayerFields });
+  const [playerData, setPlayerData] = useState<PlayerState | null>(null);
+  const [formData, setFormData] = useState<PlayerState>(defaultPlayerFields);
+  const [editFormData, setEditFormData] = useState<PlayerState>(defaultPlayerFields);
   const [isEditing, setIsEditing] = useState(false);
-  const [editFormData, setEditFormData] = useState({});
   const [editError, setEditError] = useState('');
   const [editLoading, setEditLoading] = useState(false);
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
@@ -324,15 +330,11 @@ export default function PlayerProfile() {
       setIsLoading(true);
       console.log("Fetching player data for user:", user.uid);
       
-      // استرجاع وثيقة اللاعب من Firestore
       const playerRef = doc(db, 'players', user.uid);
       const playerDoc = await getDoc(playerRef);
       
-      console.log("Firestore response:", playerDoc.exists() ? "Document exists" : "No document found");
-      
       if (playerDoc.exists()) {
-        const data = playerDoc.data();
-        console.log("Player data from Firestore:", data);
+        const data = playerDoc.data() as PlayerState;
         
         // Helper function to format date
         type DateValue = Date | string | { toDate: () => Date } | null | undefined;
@@ -360,7 +362,7 @@ export default function PlayerProfile() {
         let additionalImagesUrls = data.additional_image_urls || [];
         
         // دمج البيانات
-        const mergedData = {
+        const mergedData: PlayerState = {
           ...defaultPlayerFields,
           ...data,
           birth_date: formatDate(data.birth_date),
