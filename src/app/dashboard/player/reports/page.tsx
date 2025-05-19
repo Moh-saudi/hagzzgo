@@ -28,6 +28,7 @@ import 'react-photo-view/dist/react-photo-view.css';
 
 // Make sure this import is at the end of your imports
 import '../../../globals.css';
+import jsPDF from 'jspdf';
 
 // تهيئة Supabase
 const supabaseUrl = 'https://ekyerljzfokqimbabzxm.supabase.co';
