@@ -1,39 +1,22 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from "@/lib/firebase/config";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronLeft, Check, Upload, Plus, Trash, X, User, GraduationCap, Heart, Trophy, Target, Image as ImageIcon, Settings, LogOut, Edit } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Upload, Plus, Trash, X } from 'lucide-react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "recharts";
 
 // Supabase Client
 import { createClient } from '@supabase/supabase-js';
 
-// Add import for DashboardLayout
-import DashboardLayout from '@/components/layout/DashboardLayout';
-
-// Add better error handling for Supabase initialization
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase configuration is missing');
-}
-
-// Initialize Supabase client with proper configuration
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
-});
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Constants & Reference Data
 const STEPS = {
@@ -108,384 +91,252 @@ const defaultPlayerFields = {
   training_courses: [],
 };
 
-// Loading Component
-const LoadingSpinner = () => (
-  <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-  </div>
-);
-
-// Error Message Component
-const ErrorMessage = ({ message }: { message: string }) => (
-  <div className="p-4 mb-4 text-red-700 bg-red-100 rounded-lg">
-    <p>{message}</p>
-  </div>
-);
-
-// Success Message Component
-const SuccessMessage = ({ message }: { message: string }) => (
-  <div className="p-4 mb-4 text-green-700 bg-green-100 rounded-lg">
-    <p>{message}</p>
-  </div>
-);
-
-// Progress Steps Component
-interface ProgressStepsProps {
-  currentStep: number;
-}
-
-const ProgressSteps: React.FC<ProgressStepsProps> = ({ currentStep }) => {
-  const steps = Object.entries(STEP_TITLES).map(([step, title]) => ({
-    number: Number(step),
-    title
-  }));
-
-  return (
-    <div className="flex justify-between mb-8">
-      {steps.map(({ number, title }) => (
-        <div
-          key={number}
-          className={`flex items-center ${
-            number === currentStep ? 'text-blue-600' : 'text-gray-400'
-          }`}
-        >
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              number === currentStep ? 'bg-blue-600 text-white' : 'bg-gray-200'
-            }`}
-          >
-            {number}
-          </div>
-          <span className="mr-2">{title}</span>
-          {number < steps.length && (
-            <div className="w-16 h-0.5 bg-gray-200"></div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// Define interfaces for props
-interface NavigationButtonsProps {
-  currentStep: number;
-  setCurrentStep: (step: number | ((prev: number) => number)) => void;
-  submitting: boolean;
-}
-
-// Update component with proper type annotations
-const NavigationButtons: React.FC<NavigationButtonsProps> = ({ 
-  currentStep, 
-  setCurrentStep, 
-  submitting 
-}) => {
-  return (
-    <div className="flex justify-between mt-8">
-      {currentStep > 1 && (
-        <Button
-          type="button"
-          onClick={() => setCurrentStep(prev => prev - 1)}
-          className="flex items-center"
-        >
-          <ChevronRight className="ml-2" />
-          السابق
-        </Button>
-      )}
-      {currentStep < Object.keys(STEP_TITLES).length ? (
-        <Button
-          type="button"
-          onClick={() => setCurrentStep(prev => prev + 1)}
-          className="flex items-center"
-        >
-          التالي
-          <ChevronLeft className="mr-2" />
-        </Button>
-      ) : (
-        <Button
-          type="submit"
-          disabled={submitting}
-          className="flex items-center"
-        >
-          {submitting ? 'جاري الحفظ...' : 'حفظ البيانات'}
-          <Check className="mr-2" />
-        </Button>
-      )}
-    </div>
-  );
-};
-
-// Helper function to combine classes with proper TypeScript types
-function classNames(...classes: (string | boolean | undefined | null)[]): string {
+// Helper function to combine classes
+function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-// Add bucket constants
-const BUCKETS = {
-  AVATARS: 'avatars',
-  PLAYER_IMAGES: 'player-images',
-  WALLET: 'wallet'
-};
+export default function PlayerProfile() {
+  console.log('PlayerProfile: component start');
+  const router = useRouter();
+  const [user, loading, error] = useAuthState(auth);
+  console.log('PlayerProfile: auth state', { user, loading, error });
 
-// Add type for media items
-interface MediaItem {
-  url: string;
-}
+  const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL);
+  const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [formErrors, setFormErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [playerData, setPlayerData] = useState(null);
+  const [formData, setFormData] = useState({ ...defaultPlayerFields });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
+  const [editError, setEditError] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+  const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
+  const [uploadingAdditionalImages, setUploadingAdditionalImages] = useState({});
 
-interface PlayerData {
-  full_name: string;
-  birth_date: string | Date;
-  nationality: string;
-  city: string;
-  country: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
-  brief: string;
-  education_level: string;
-  graduation_year: string;
-  english_level: string;
-  arabic_level: string;
-  spanish_level: string;
-  blood_type: string;
-  height: string;
-  weight: string;
-  chronic_details: string;
-  primary_position: string;
-  secondary_position: string;
-  preferred_foot: string;
-  technical_skills: Record<string, number>;
-  physical_skills: Record<string, number>;
-  social_skills: Record<string, number>;
-  objectives: Record<string, boolean | string>;
-  profile_image: MediaItem | null;
-  additional_images: MediaItem[];
-  videos: VideoItem[];
-  training_courses: string[];
-}
+  console.log('PlayerProfile: state initialized', { isLoading, playerData, formData });
 
-interface VideoItem {
-  url: string;
-  description: string;
-}
+  // Get player data on component mount
+  useEffect(() => {
+    console.log('PlayerProfile: useEffect triggered', { user, loading });
+    if (!loading && user) {
+      console.log("User loaded, fetching player data");
+      fetchPlayerData();
+    } else if (!loading && !user) {
+      console.log("No user found, redirecting to login");
+      router.push('/auth/login');
+    }
+  }, [user, loading]);
 
-// Add PlayerState interface
-interface PlayerState extends PlayerData {
-  created_at?: Date;
-  updated_at?: Date;
-  profile_image_url?: string;
-  additional_image_urls?: string[];
-}
+  // Initialize edit form data when player data is loaded
+  useEffect(() => {
+    console.log('PlayerProfile: playerData changed', { playerData });
+    if (playerData) {
+      setEditFormData({ ...defaultPlayerFields, ...playerData });
+    }
+  }, [playerData]);
 
-// Helper function to format date values
-const formatDate = (dateValue: Date | string | { toDate: () => Date } | null | undefined): string => {
-  if (!dateValue) return '';
+  console.log('PlayerProfile: before render', { loading, isLoading, error, playerData });
+
+  if (loading || isLoading) {
+    console.log('PlayerProfile: Rendering loading state');
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+          <p className="mt-4 text-gray-600">جاري تحميل البيانات...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || formErrors.fetch) {
+    console.log('PlayerProfile: Rendering error state', error, formErrors.fetch);
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="p-8 text-center bg-white rounded-lg shadow-md">
+          <h2 className="mb-4 text-2xl font-semibold text-red-600">حدث خطأ</h2>
+          <p className="mb-6 text-gray-600">{error?.message || formErrors.fetch}</p>
+          <Button onClick={() => router.push('/auth/login')} className="text-white bg-blue-600 hover:bg-blue-700">
+            العودة إلى صفحة تسجيل الدخول
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    console.log('PlayerProfile: No user found, redirecting to login');
+    router.push('/auth/login');
+    return null;
+  }
+
+  console.log('PlayerProfile: Rendering main form');
+  // =========== Supabase Storage Functions ===========
   
-  try {
-    // Handle Firestore Timestamp
-    if (dateValue && typeof dateValue === 'object' && 'toDate' in dateValue) {
-      return dateValue.toDate().toISOString().split('T')[0];
+  /**
+   * رفع صورة البروفايل إلى bucket للصور الشخصية
+   * @param {File} file - ملف الصورة
+   * @param {string} userId - معرف المستخدم
+   * @returns {Promise<string>} - رابط الصورة
+   */
+  const uploadProfileImage = async (file, userId) => {
+    try {
+      // تحديد امتداد الملف
+      const fileExt = file.name.split('.').pop();
+      // إنشاء مسار فريد للملف
+      const filePath = `${userId}/profile.${fileExt}`;
+      
+      // رفع الملف إلى bucket avatars
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+      
+      if (uploadError) {
+        console.error('خطأ أثناء رفع صورة البروفايل:', uploadError.message);
+        throw uploadError;
+      }
+      
+      // الحصول على الرابط العام للصورة
+      const { data } = await supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+      
+      // تأكد من أن الرابط يبدأ بـ http
+      let url = data.publicUrl;
+      if (url && !url.startsWith('http')) {
+        url = 'https://' + url;
+      }
+      
+      console.log('تم رفع صورة البروفايل بنجاح:', url);
+      return url;
+    } catch (error) {
+      console.error('فشل في رفع صورة البروفايل:', error);
+      throw error;
     }
-    
-    // Handle string date
-    if (typeof dateValue === 'string') {
-      return new Date(dateValue).toISOString().split('T')[0];
-    }
-    
-    // Handle Date object
-    if (dateValue instanceof Date) {
-      return dateValue.toISOString().split('T')[0];
-    }
-    
-    return '';
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return '';
-  }
-};
+  };
 
-// Add these interfaces near the top of your file
-interface FileUploadOptions {
-  upsert?: boolean;
-  cacheControl?: string;
-  contentType?: string;
-}
-
-// Update the file upload functions with proper type annotations
-const uploadProfileImage = async (
-  file: File,
-  userId: string
-): Promise<string> => {
-  try {
-    // Check authentication first
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session) {
-      throw new Error('يجب تسجيل الدخول أولاً');
+  /**
+   * رفع صورة إضافية إلى bucket للصور الإضافية
+   * @param {File} file - ملف الصورة
+   * @param {string} userId - معرف المستخدم
+   * @param {number} idx - فهرس الصورة (اختياري)
+   * @returns {Promise<string>} - رابط الصورة
+   */
+  const uploadAdditionalImage = async (file, userId, idx = Date.now()) => {
+    try {
+      // تحديد امتداد الملف
+      const fileExt = file.name.split('.').pop();
+      // إنشاء مسار فريد للملف باستخدام الطابع الزمني
+      const filePath = `${userId}/additional_${Date.now()}_${idx}.${fileExt}`;
+      
+      // رفع الملف إلى bucket player-images
+      const { error: uploadError } = await supabase.storage
+        .from('player-images')
+        .upload(filePath, file, { upsert: true });
+      
+      if (uploadError) {
+        console.error('خطأ أثناء رفع صورة إضافية:', uploadError.message);
+        throw uploadError;
+      }
+      
+      // الحصول على الرابط العام للصورة
+      const { data } = await supabase.storage
+        .from('player-images')
+        .getPublicUrl(filePath);
+      
+      // تأكد من أن الرابط يبدأ بـ http
+      let url = data.publicUrl;
+      if (url && !url.startsWith('http')) {
+        url = 'https://' + url;
+      }
+      
+      console.log('تم رفع صورة إضافية بنجاح:', url);
+      return url;
+    } catch (error) {
+      console.error('فشل في رفع صورة إضافية:', error);
+      throw error;
     }
+  };
 
-    // Create unique file path
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${userId}/profile.${fileExt}`;
-    
-    console.log('Uploading profile image to:', filePath);
-    
-    // File validation
-    if (file.size > 5 * 1024 * 1024) {
-      throw new Error('حجم الملف يجب أن يكون أقل من 5 ميجابايت');
-    }
-    
-    if (!file.type.startsWith('image/')) {
-      throw new Error('يجب أن يكون الملف صورة');
-    }
+  // =========== Firestore Data Functions ===========
 
-    // Upload file to Supabase storage
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKETS.AVATARS)
-      .upload(filePath, file, {
-        upsert: true,
-        cacheControl: '3600',
-        contentType: file.type
-      });
-    
-    if (uploadError) {
-      throw new Error(`فشل في رفع الصورة: ${uploadError.message}`);
-    }
-
-    // Get public URL
-    const { data: urlData } = await supabase.storage
-      .from(BUCKETS.AVATARS)
-      .getPublicUrl(filePath);
-
-    if (!urlData?.publicUrl) {
-      throw new Error('فشل في الحصول على رابط الصورة');
+  /**
+   * استرجاع بيانات اللاعب من Firestore و Supabase
+   */
+  const fetchPlayerData = async () => {
+    if (!user) {
+      console.log("No user found");
+      return;
     }
 
-    return urlData.publicUrl.startsWith('http') 
-      ? urlData.publicUrl 
-      : `https://${urlData.publicUrl}`;
+    try {
+      setIsLoading(true);
+      console.log("Fetching player data for user:", user.uid);
+      
+      // استرجاع وثيقة اللاعب من Firestore
+      const playerRef = doc(db, 'players', user.uid);
+      const playerDoc = await getDoc(playerRef);
+      
+      console.log("Firestore response:", playerDoc.exists() ? "Document exists" : "No document found");
+      
+      if (playerDoc.exists()) {
+        const data = playerDoc.data();
+        console.log("Player data from Firestore:", data);
+        
+        // معالجة الصور والروابط
+        let profileImageUrl = data.profile_image_url || '';
+        let additionalImagesUrls = data.additional_image_urls || [];
+        
+        // دمج البيانات
+        const mergedData = {
+          ...defaultPlayerFields,
+          ...data,
+          birth_date: data.birth_date ? new Date(data.birth_date.toDate()).toISOString().split('T')[0] : '',
+          profile_image: profileImageUrl ? { url: profileImageUrl } : null,
+          additional_images: additionalImagesUrls.map(url => ({ url })),
+        };
+        
+        console.log("Merged player data:", mergedData);
+        
+        setPlayerData(mergedData);
+        setFormData(mergedData);
+      } else {
+        console.log("No player data found in Firestore");
+        // إذا لم يتم العثور على بيانات، قم بإنشاء وثيقة جديدة
+        const newPlayerData = {
+          ...defaultPlayerFields,
+          created_at: new Date(),
+          updated_at: new Date(),
+        };
+        
+        try {
+          await setDoc(playerRef, newPlayerData);
+          console.log("Created new player document");
+          setPlayerData(newPlayerData);
+          setFormData(newPlayerData);
+        } catch (error) {
+          console.error("Error creating new player document:", error);
+          setFormErrors(prev => ({
+            ...prev,
+            create: 'حدث خطأ أثناء إنشاء الملف الشخصي'
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching player data:', error);
+      setFormErrors(prev => ({
+        ...prev,
+        fetch: 'حدث خطأ أثناء جلب البيانات'
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  } catch (error) {
-    console.error('فشل في رفع صورة البروفايل:', error);
-    throw error;
-  }
-};
-
-const uploadAdditionalImage = async (
-  file: File,
-  userId: string,
-  idx: number = Date.now()
-): Promise<string> => {
-  try {
-    // تحديد امتداد الملف
-    const fileExt = file.name.split('.').pop();
-    // إنشاء مسار فريد للملف باستخدام الطابع الزمني
-    const filePath = `${userId}/additional_${Date.now()}_${idx}.${fileExt}`;
-    
-    console.log('Uploading additional image to:', filePath);
-    
-    // التحقق من حجم الملف (أقل من 5 ميجابايت)
-    if (file.size > 5 * 1024 * 1024) {
-      throw new Error('حجم الملف يجب أن يكون أقل من 5 ميجابايت');
-    }
-    
-    // التحقق من نوع الملف
-    if (!file.type.startsWith('image/')) {
-      throw new Error('يجب أن يكون الملف صورة');
-    }
-    
-    // رفع الملف إلى bucket player-images
-    const { error: uploadError, data } = await supabase.storage
-      .from(BUCKETS.PLAYER_IMAGES)
-      .upload(filePath, file, { 
-        upsert: true,
-        cacheControl: '3600',
-        contentType: file.type
-      });
-    
-    if (uploadError) {
-      console.error('خطأ أثناء رفع صورة إضافية:', uploadError);
-      throw new Error(`فشل في رفع الصورة: ${uploadError.message}`);
-    }
-    
-    // الحصول على الرابط العام للصورة
-    const { data: urlData } = await supabase.storage
-      .from(BUCKETS.PLAYER_IMAGES)
-      .getPublicUrl(filePath);
-    
-    if (!urlData?.publicUrl) {
-      throw new Error('فشل في الحصول على رابط الصورة');
-    }
-    
-    // تأكد من أن الرابط يبدأ بـ http
-    let url = urlData.publicUrl;
-    if (url && !url.startsWith('http')) {
-      url = 'https://' + url;
-    }
-    
-    console.log('تم رفع صورة إضافية بنجاح:', url);
-    return url;
-  } catch (error) {
-    console.error('فشل في رفع صورة إضافية:', error);
-    throw error;
-  }
-};
-
-const uploadWalletDocument = async (
-  file: File,
-  userId: string,
-  documentType: string
-): Promise<string> => {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Supabase configuration is missing');
-  }
-
-  try {
-    // Check authentication first
-    await checkSupabaseAuth();
-
-    // تحديد امتداد الملف
-    const fileExt = file.name.split('.').pop();
-    // إنشاء مسار فريد للملف
-    const filePath = `${userId}/${documentType}_${Date.now()}.${fileExt}`;
-    
-    console.log('Uploading wallet document to:', filePath);
-    
-    // رفع الملف إلى bucket wallet
-    const { error: uploadError, data } = await supabase.storage
-      .from(BUCKETS.WALLET)
-      .upload(filePath, file, { 
-        upsert: true,
-        cacheControl: '3600'
-      });
-    
-    if (uploadError) {
-      console.error('خطأ أثناء رفع وثيقة المحفظة:', uploadError);
-      throw new Error(`فشل في رفع الوثيقة: ${uploadError.message}`);
-    }
-    
-    // الحصول على الرابط العام للوثيقة
-    const { data: urlData } = await supabase.storage
-      .from(BUCKETS.WALLET)
-      .getPublicUrl(filePath);
-    
-    if (!urlData?.publicUrl) {
-      throw new Error('فشل في الحصول على رابط الوثيقة');
-    }
-    
-    // تأكد من أن الرابط يبدأ بـ http
-    let url = urlData.publicUrl;
-    if (url && !url.startsWith('http')) {
-      url = 'https://' + url;
-    }
-    
-    console.log('تم رفع وثيقة المحفظة بنجاح:', url);
-    return url;
-  } catch (error) {
-    console.error('فشل في رفع وثيقة المحفظة:', error);
-    throw error;
-  }
-};
-
-// =========== Form Handling Functions ===========
+  // =========== Form Handling Functions ===========
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -495,7 +346,7 @@ const uploadWalletDocument = async (
 
   // Handle Save Button
   const handleSave = async () => {
-    setSubmitting(true);
+    setEditLoading(true);
     setEditError('');
     
     try {
@@ -543,7 +394,7 @@ const uploadWalletDocument = async (
       console.error("خطأ أثناء حفظ البيانات:", err);
       setEditError('حدث خطأ أثناء حفظ البيانات');
     } finally {
-      setSubmitting(false);
+      setEditLoading(false);
     }
   };
 
@@ -586,13 +437,11 @@ const uploadWalletDocument = async (
   };
   
   // File upload handler for profile image
-  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user?.uid) return;
+  const handleProfileImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
     
     setUploadingProfileImage(true);
-    setFormErrors(prev => ({ ...prev, profileImage: '' }));
-    
     try {
       const uploadedUrl = await uploadProfileImage(file, user.uid);
       setEditFormData(prev => ({ 
@@ -1080,190 +929,7 @@ const uploadWalletDocument = async (
   const renderSkills = () => (
     <div className="space-y-8">
       <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">المهارات والقدرات</h2>
-      
-      {/* Technical Skills */}
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        {[
-          { key: 'ball_control', label: 'التحكم بالكرة' },
-          { key: 'passing', label: 'التمرير' },
-          { key: 'shooting', label: 'التسديد' },
-          { key: 'dribbling', label: 'المراوغة' }
-        ].map(skill => (
-          <div key={skill.key}>
-            <div className="flex justify-between mb-1 text-sm text-gray-600">
-              <span>{skill.label}</span>
-              <span>
-                {isEditing ? (
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    value={editFormData.technical_skills?.[skill.key] || ''}
-                    onChange={e => {
-                      setEditFormData(prev => ({
-                        ...prev,
-                        technical_skills: {
-                          ...prev.technical_skills,
-                          [skill.key]: e.target.value
-                        }
-                      }));
-                    }}
-                    className="w-16 p-1 border rounded"
-                  />
-                ) : (
-                  (formData.technical_skills?.[skill.key] || 'غير محدد') + '/5'
-                )}
-              </span>
-            </div>
-            <div className="w-full h-2 bg-gray-200 rounded-lg">
-              <div
-                className="h-full bg-blue-600 rounded-lg"
-                style={{ 
-                  width: `${((isEditing 
-                    ? editFormData.technical_skills?.[skill.key] 
-                    : formData.technical_skills?.[skill.key]) || 0) * 20}%` 
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* Physical Skills */}
-      <div>
-        <h3 className="mb-4 text-lg font-medium">المهارات البدنية</h3>
-        <div className="space-y-4">
-          {[
-            { key: 'speed', label: 'السرعة' },
-            { key: 'strength', label: 'القوة البدنية' },
-            { key: 'stamina', label: 'التحمل' },
-            { key: 'agility', label: 'الرشاقة' },
-            { key: 'balance', label: 'التوازن' },
-            { key: 'flexibility', label: 'المرونة' }
-          ].map(skill => (
-            <div key={skill.key}>
-              <div className="flex justify-between mb-1 text-sm text-gray-600">
-                <span>{skill.label}</span>
-                <span>
-                  {isEditing ? (
-                    <input
-                      type="number"
-                      min="1"
-                      max="5"
-                      value={editFormData.physical_skills?.[skill.key] || ''}
-                      onChange={e => {
-                        setEditFormData(prev => ({
-                          ...prev,
-                          physical_skills: {
-                            ...prev.physical_skills,
-                            [skill.key]: e.target.value
-                          }
-                        }));
-                      }}
-                      className="w-16 p-1 border rounded"
-                    />
-                  ) : (
-                    (formData.physical_skills?.[skill.key] || 'غير محدد') + '/5'
-                  )}
-                </span>
-              </div>
-              <div className="w-full h-2 bg-gray-200 rounded-lg">
-                <div
-                  className="h-full bg-green-600 rounded-lg"
-                  style={{ 
-                    width: `${((isEditing 
-                      ? editFormData.physical_skills?.[skill.key] 
-                      : formData.physical_skills?.[skill.key]) || 0) * 20}%` 
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Social Skills */}
-      <div>
-        <h3 className="mb-4 text-lg font-medium">المهارات الاجتماعية</h3>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {[
-            { key: 'teamwork', label: 'العمل الجماعي' },
-            { key: 'communication', label: 'التواصل' },
-            { key: 'discipline', label: 'الانضباط' },
-            { key: 'self_confidence', label: 'الثقة بالنفس' },
-            { key: 'pressure_handling', label: 'تحمل الضغط' },
-            { key: 'punctuality', label: 'الالتزام بالمواعيد' }
-          ].map(skill => (
-            <div key={skill.key}>
-              <div className="flex justify-between mb-1 text-sm text-gray-600">
-                <span>{skill.label}</span>
-                <span>
-                  {isEditing ? (
-                    <input
-                      type="number"
-                      min="1"
-                      max="5"
-                      value={editFormData.social_skills?.[skill.key] || ''}
-                      onChange={e => {
-                        setEditFormData(prev => ({
-                          ...prev,
-                          social_skills: {
-                            ...prev.social_skills,
-                            [skill.key]: e.target.value
-                          }
-                        }));
-                      }}
-                      className="w-16 p-1 border rounded"
-                    />
-                  ) : (
-                    (formData.social_skills?.[skill.key] || 'غير محدد') + '/5'
-                  )}
-                </span>
-              </div>
-              <div className="w-full h-2 bg-gray-200 rounded-lg">
-                <div
-                  className="h-full bg-purple-600 rounded-lg"
-                  style={{ 
-                    width: `${((isEditing 
-                      ? editFormData.social_skills?.[skill.key] 
-                      : formData.social_skills?.[skill.key]) || 0) * 20}%` 
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Skill Radar Chart */}
-      {!isEditing && (
-        <div className="p-4 mt-8 bg-white rounded-lg shadow-md">
-          <h3 className="mb-4 text-lg font-medium text-center">مخطط المهارات</h3>
-          <div className="h-80">
-            <RadarChart
-              cx="50%"
-              cy="50%"
-              outerRadius="80%"
-              width={500}
-              height={300}
-              data={[
-                { subject: 'التحكم بالكرة', A: formData.technical_skills?.ball_control || 0 },
-                { subject: 'التمرير', A: formData.technical_skills?.passing || 0 },
-                { subject: 'التسديد', A: formData.technical_skills?.shooting || 0 },
-                { subject: 'المراوغة', A: formData.technical_skills?.dribbling || 0 },
-                { subject: 'السرعة', A: formData.physical_skills?.speed || 0 },
-                { subject: 'القوة', A: formData.physical_skills?.strength || 0 },
-                { subject: 'التحمل', A: formData.physical_skills?.stamina || 0 }
-              ]}
-            >
-              <PolarGrid />
-              <PolarAngleAxis dataKey="subject" />
-              <PolarRadiusAxis angle={90} domain={[0, 5]} />
-              <Radar name="المهارات" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-            </RadarChart>
-          </div>
-        </div>
-      )}
+      <div>skills placeholder</div>
     </div>
   );
 
@@ -1271,542 +937,132 @@ const uploadWalletDocument = async (
   const renderObjectives = () => (
     <div className="space-y-6">
       <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">الأهداف والطموحات</h2>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">الأهداف المهنية</h3>
-          
-          <div className="space-y-2">
-            {Object.entries({
-              professional: 'الاحتراف الكامل',
-              trials: 'معايشات احترافية',
-              local_leagues: 'المشاركة في دوريات محلية',
-              arab_leagues: 'المشاركة في دوريات عربية',
-              european_leagues: 'المشاركة في دوريات أوروبية',
-              training: 'تدريبات احترافية'
-            }).map(([key, label]) => (
-              <label key={key} className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50">
-                <input
-                  type="checkbox"
-                  checked={formData.objectives[key]}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    objectives: {
-                      ...formData.objectives,
-                      [key]: e.target.checked
-                    }
-                  })}
-                  className="text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  disabled={submitting}
-                />
-                <span className="text-gray-700">{label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Other Objectives */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            أهداف أخرى
-          </label>
-          <textarea
-            value={formData.objectives.other}
-            onChange={(e) => setFormData({
-              ...formData,
-              objectives: {
-                ...formData.objectives,
-                other: e.target.value
-              }
-            })}
-            className="block w-full p-2 mt-1 border border-gray-300 rounded-md"
-            rows={4}
-            placeholder="اكتب هنا أي أهداف أو طموحات إضافية..."
-            disabled={submitting}
-          />
-          <p className="mt-2 text-sm text-gray-500">
-            يمكنك كتابة أي أهداف أخرى لم يتم ذكرها أعلاه
-          </p>
-        </div>
-      </div>
+      <div>objectives placeholder</div>
     </div>
   );
 
   // Render Media Section
   const renderMedia = () => (
     <div className="space-y-6">
-      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">
-        الصور والفيديوهات
-      </h2>
-
-      {/* Additional Images */}
-      <div>
-        <label className="block mb-2 text-sm font-medium text-gray-700">
-          صور إضافية (حتى 5 صور)
-        </label>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-          {formData.additional_images.map((image, index) => (
-            <div key={index} className="relative">
-              <img
-                src={typeof image === 'string' ? image : image.url}
-                alt={`Additional ${index + 1}`}
-                className="object-cover w-full h-32 rounded-lg"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  const newImages = formData.additional_images.filter((_, i) => i !== index);
-                  setFormData({...formData, additional_images: newImages});
-                }}
-                className="absolute p-1 text-white bg-red-500 rounded-full top-1 left-1 hover:bg-red-600"
-                disabled={submitting}
-              >
-                <Trash size={16} />
-              </button>
-            </div>
-          ))}
-          {formData.additional_images.length < 5 && (
-            <div className="p-4 border-2 border-gray-300 border-dashed rounded-lg">
-              <input
-                type="file"
-                id="additional_images"
-                className="hidden"
-                accept="image/*"
-                onChange={async (e) => {
-                  if (e.target.files[0]) {
-                    try {
-                      const uploadedUrl = await uploadAdditionalImage(e.target.files[0], user.uid);
-                      setFormData({
-                        ...formData,
-                        additional_images: [...formData.additional_images, { url: uploadedUrl }]
-                      });
-                    } catch (error) {
-                      console.error("Error uploading image:", error);
-                      setFormErrors(prev => ({
-                        ...prev,
-                        additionalImage: 'فشل في رفع الصورة'
-                      }));
-                    }
-                  }
-                }}
-                disabled={submitting}
-              />
-              <label
-                htmlFor="additional_images"
-                className="flex flex-col items-center justify-center h-full cursor-pointer"
-              >
-                <Upload className="w-8 h-8 text-gray-400" />
-                <span className="mt-2 text-sm text-gray-500">إضافة صورة</span>
-              </label>
-            </div>
-          )}
-        </div>
-        <p className="mt-2 text-sm text-gray-500">
-          يمكنك إضافة حتى 5 صور إضافية لإظهار مهاراتك ولحظاتك المميزة
-        </p>
-      </div>
-
-      {/* Videos */}
-      <div>
-        <label className="block mb-2 text-sm font-medium text-gray-700">
-          روابط الفيديو (حتى 5 روابط)
-        </label>
-        <div className="space-y-2">
-          {formData.videos.map((video, index) => (
-            <div key={index} className="flex gap-2">
-              <input
-                type="text"
-                value={video.url}
-                onChange={(e) => {
-                  const newVideos = [...formData.videos];
-                  newVideos[index] = { ...video, url: e.target.value };
-                  setFormData({ ...formData, videos: newVideos });
-                }}
-                className="flex-1 p-2 border border-gray-300 rounded-md"
-                placeholder="رابط الفيديو (YouTube أو مشابه)"
-                disabled={submitting}
-              />
-              <input
-                type="text"
-                value={video.description}
-                onChange={(e) => {
-                  const newVideos = [...formData.videos];
-                  newVideos[index] = { ...video, description: e.target.value };
-                  setFormData({ ...formData, videos: newVideos });
-                }}
-                className="flex-1 p-2 border border-gray-300 rounded-md"
-                placeholder="وصف الفيديو"
-                disabled={submitting}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  const newVideos = formData.videos.filter((_, i) => i !== index);
-                  setFormData({ ...formData, videos: newVideos });
-                }}
-                className="p-2 text-red-500 hover:text-red-700"
-                disabled={submitting}
-              >
-                <Trash size={20} />
-              </button>
-            </div>
-          ))}
-          {formData.videos.length < 5 && (
-            <button
-              type="button"
-              onClick={() => setFormData({
-                ...formData,
-                videos: [...formData.videos, { url: '', description: '' }]
-              })}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-              disabled={submitting}
-            >
-              <Plus size={20} />
-              <span>إضافة رابط فيديو</span>
-            </button>
-          )}
-        </div>
-        <p className="mt-2 text-sm text-gray-500">
-          أضف روابط لفيديوهات تظهر مهاراتك في الملعب أو لقطات من المباريات
-        </p>
-      </div>
+      <h2 className="pr-4 text-2xl font-semibold border-r-4 border-blue-500">الصور والفيديوهات</h2>
+      <div>media placeholder</div>
     </div>
   );
   
   
   // Main Component Return
+  console.log('PlayerProfile: Rendering main form');
   return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir="rtl">
-        {/* Loading Overlay */}
-        {submitting && <LoadingSpinner />}
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir="rtl">
+      {/* Loading Overlay */}
+      {submitting && <LoadingSpinner />}
 
-        {/* Success Message */}
-        {successMessage && <SuccessMessage message={successMessage} />}
+      {/* Success Message */}
+      {successMessage && <SuccessMessage message={successMessage} />}
 
-        {/* Error Message */}
-        {Object.keys(formErrors).length > 0 && (
-          <ErrorMessage message={Object.values(formErrors)[0]} />
-        )}
+      <header className="py-6 text-white bg-gradient-to-r from-blue-600 to-blue-800">
+        <div className="container px-4 mx-auto">
+          <h1 className="text-3xl font-bold text-center">نموذج تسجيل لاعب كرة القدم</h1>
+          {user && (
+            <p className="mt-2 text-center text-blue-100">
+              مرحباً {user.email}
+            </p>
+          )}
+        </div>
+      </header>
 
-        <header className="py-6 text-white bg-gradient-to-r from-blue-600 to-blue-800">
-          <div className="container px-4 mx-auto">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">نموذج تسجيل لاعب كرة القدم</h1>
-              {user && (
-                <div className="flex items-center gap-4">
-                  <p className="text-blue-100">مرحباً {user.email}</p>
-                  <Button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50"
-                  >
-                    {isEditing ? (
-                      <>
-                        <X className="w-4 h-4" />
-                        إلغاء التعديل
-                      </>
-                    ) : (
-                      <>
-                        <Edit className="w-4 h-4" />
-                        تعديل البيانات
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
+      <main className="container px-4 py-8 mx-auto">
+        {formErrors.submit && <ErrorMessage message={formErrors.submit} />}
+
+        <form onSubmit={handleSubmit} className="p-6 bg-white rounded-lg shadow-lg">
+          {/* Progress Steps */}
+          <ProgressSteps />
+
+          {/* Form Sections */}
+          {currentStep === STEPS.PERSONAL && renderPersonalInfo()}
+          {currentStep === STEPS.EDUCATION && renderEducation()}
+          {currentStep === STEPS.MEDICAL && renderMedicalRecord()}
+          {currentStep === STEPS.SPORTS && renderSportsInfo()}
+          {currentStep === STEPS.SKILLS && renderSkills()}
+          {currentStep === STEPS.OBJECTIVES && renderObjectives()}
+          {currentStep === STEPS.MEDIA && renderMedia()}
+
+          {/* Navigation Buttons */}
+          <NavigationButtons />
+        </form>
+      </main>
+
+      {/* Footer */}
+      <footer className="py-8 mt-12 text-white bg-gray-800">
+        <div className="container px-4 mx-auto">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div>
+              <h3 className="mb-4 text-lg font-semibold">روابط مهمة</h3>
+              <ul className="space-y-2">
+                <li><a href="#" className="hover:text-blue-400">الشروط والأحكام</a></li>
+                <li><a href="#" className="hover:text-blue-400">سياسة الخصوصية</a></li>
+                <li><a href="#" className="hover:text-blue-400">الأسئلة الشائعة</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="mb-4 text-lg font-semibold">تواصل معنا</h3>
+              <ul className="space-y-2">
+                <li>البريد الإلكتروني: support@example.com</li>
+                <li>الهاتف: +966 55 555 5555</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="mb-4 text-lg font-semibold">تابعنا</h3>
+              <div className="flex space-x-4">
+                {/* Add social media icons/links here */}
+              </div>
             </div>
           </div>
-        </header>
-
-        <main className="container px-4 py-8 mx-auto">
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            handleSave();
-          }} className="p-6 bg-white rounded-lg shadow-lg">
-            {/* Progress Steps */}
-            <ProgressSteps currentStep={currentStep} />
-
-            {/* Form Sections */}
-            {currentStep === STEPS.PERSONAL && renderPersonalInfo()}
-            {currentStep === STEPS.EDUCATION && renderEducation()}
-            {currentStep === STEPS.MEDICAL && renderMedicalRecord()}
-            {currentStep === STEPS.SPORTS && renderSportsInfo()}
-            {currentStep === STEPS.SKILLS && renderSkills()}
-            {currentStep === STEPS.OBJECTIVES && renderObjectives()}
-            {currentStep === STEPS.MEDIA && renderMedia()}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8">
-              {currentStep > 1 && (
-                <Button
-                  type="button"
-                  onClick={() => setCurrentStep(prev => prev - 1)}
-                  className="flex items-center"
-                >
-                  <ChevronRight className="ml-2" />
-                  السابق
-                </Button>
-              )}
-              {currentStep < Object.keys(STEP_TITLES).length ? (
-                <Button
-                  type="button"
-                  onClick={() => setCurrentStep(prev => prev + 1)}
-                  className="flex items-center"
-                >
-                  التالي
-                  <ChevronLeft className="mr-2" />
-                </Button>
-              ) : (
-                <div className="flex gap-4">
-                  {isEditing && (
-                    <Button
-                      type="button"
-                      onClick={handleCancel}
-                      variant="outline"
-                      className="flex items-center"
-                    >
-                      <X className="mr-2" />
-                      إلغاء
-                    </Button>
-                  )}
-                  <Button
-                    type="submit"
-                    disabled={submitting}
-                    className="flex items-center"
-                  >
-                    {submitting ? 'جاري الحفظ...' : 'حفظ البيانات'}
-                    <Check className="mr-2" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          </form>
-        </main>
-
-        {/* Footer */}
-        <footer className="py-8 mt-12 text-white bg-gray-800">
-          <div className="container px-4 mx-auto">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-              <div>
-                <h3 className="mb-4 text-lg font-semibold">روابط مهمة</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-blue-400">الشروط والأحكام</a></li>
-                  <li><a href="#" className="hover:text-blue-400">سياسة الخصوصية</a></li>
-                  <li><a href="#" className="hover:text-blue-400">الأسئلة الشائعة</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="mb-4 text-lg font-semibold">تواصل معنا</h3>
-                <ul className="space-y-2">
-                  <li>البريد الإلكتروني: support@example.com</li>
-                  <li>الهاتف: +966 55 555 5555</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="mb-4 text-lg font-semibold">تابعنا</h3>
-                <div className="flex space-x-4">
-                  {/* Add social media icons/links here */}
-                </div>
-              </div>
-            </div>
-            <div className="pt-8 mt-8 text-center border-t border-gray-700">
-              <p>&copy; {new Date().getFullYear()} جميع الحقوق محفوظة</p>
-            </div>
+          <div className="pt-8 mt-8 text-center border-t border-gray-700">
+            <p>&copy; {new Date().getFullYear()} جميع الحقوق محفوظة</p>
           </div>
-        </footer>
-      </div>
-    </DashboardLayout>
+        </div>
+      </footer>
+    </div>
   );
 };
 
-// Add type definitions at the top
-interface IconProps extends React.SVGProps<SVGSVGElement> {
-  size?: number;
-}
-
-// Icon components
-const Phone: React.FC<IconProps> = ({ size = 24, ...props }) => (
+// Phone icon component
+const Phone = (props) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
     viewBox="0 0 24 24" 
     fill="none" 
     stroke="currentColor" 
-    width={size}
-    height={size}
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
     {...props}
   >
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
   </svg>
 );
 
-const FileText: React.FC<IconProps> = ({ size = 24, ...props }) => (
+// FileText icon component
+const FileText = (props) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
     viewBox="0 0 24 24" 
     fill="none" 
     stroke="currentColor" 
-    width={size}
-    height={size}
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
     {...props}
   >
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="16" y1="13" x2="8" y2="13"/>
-    <line x1="16" y1="17" x2="8" y2="17"/>
-    <polyline points="10 9 9 9 8 9"/>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13"></line>
+    <line x1="16" y1="17" x2="8" y2="17"></line>
+    <polyline points="10 9 9 9 8 9"></polyline>
   </svg>
 );
-
-// Main component
-const PlayerProfilePage = () => {
-  // ...existing state and hooks declarations...
-  
-  // ...existing helper functions...
-  
-  // ...existing section render functions...
-  
-  return (
-    <DashboardLayout>
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir="rtl">
-        {/* Loading Overlay */}
-        {submitting && <LoadingSpinner />}
-
-        {/* Success Message */}
-        {successMessage && <SuccessMessage message={successMessage} />}
-
-        {/* Error Message */}
-        {Object.keys(formErrors).length > 0 && (
-          <ErrorMessage message={Object.values(formErrors)[0]} />
-        )}
-
-        <header className="py-6 text-white bg-gradient-to-r from-blue-600 to-blue-800">
-          <div className="container px-4 mx-auto">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">نموذج تسجيل لاعب كرة القدم</h1>
-              {user && (
-                <div className="flex items-center gap-4">
-                  <p className="text-blue-100">مرحباً {user.email}</p>
-                  <Button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50"
-                  >
-                    {isEditing ? (
-                      <>
-                        <X className="w-4 h-4" />
-                        إلغاء التعديل
-                      </>
-                    ) : (
-                      <>
-                        <Edit className="w-4 h-4" />
-                        تعديل البيانات
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
-
-        <main className="container px-4 py-8 mx-auto">
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            handleSave();
-          }} className="p-6 bg-white rounded-lg shadow-lg">
-            {/* Progress Steps */}
-            <ProgressSteps currentStep={currentStep} />
-
-            {/* Form Sections */}
-            {currentStep === STEPS.PERSONAL && renderPersonalInfo()}
-            {currentStep === STEPS.EDUCATION && renderEducation()}
-            {currentStep === STEPS.MEDICAL && renderMedicalRecord()}
-            {currentStep === STEPS.SPORTS && renderSportsInfo()}
-            {currentStep === STEPS.SKILLS && renderSkills()}
-            {currentStep === STEPS.OBJECTIVES && renderObjectives()}
-            {currentStep === STEPS.MEDIA && renderMedia()}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8">
-              {currentStep > 1 && (
-                <Button
-                  type="button"
-                  onClick={() => setCurrentStep(prev => prev - 1)}
-                  className="flex items-center"
-                >
-                  <ChevronRight className="ml-2" />
-                  السابق
-                </Button>
-              )}
-              {currentStep < Object.keys(STEP_TITLES).length ? (
-                <Button
-                  type="button"
-                  onClick={() => setCurrentStep(prev => prev + 1)}
-                  className="flex items-center"
-                >
-                  التالي
-                  <ChevronLeft className="mr-2" />
-                </Button>
-              ) : (
-                <div className="flex gap-4">
-                  {isEditing && (
-                    <Button
-                      type="button"
-                      onClick={handleCancel}
-                      variant="outline"
-                      className="flex items-center"
-                    >
-                      <X className="mr-2" />
-                      إلغاء
-                    </Button>
-                  )}
-                  <Button
-                    type="submit"
-                    disabled={submitting}
-                    className="flex items-center"
-                  >
-                    {submitting ? 'جاري الحفظ...' : 'حفظ البيانات'}
-                    <Check className="mr-2" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          </form>
-        </main>
-
-        {/* Footer */}
-        <footer className="py-8 mt-12 text-white bg-gray-800">
-          <div className="container px-4 mx-auto">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-              <div>
-                <h3 className="mb-4 text-lg font-semibold">روابط مهمة</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-blue-400">الشروط والأحكام</a></li>
-                  <li><a href="#" className="hover:text-blue-400">سياسة الخصوصية</a></li>
-                  <li><a href="#" className="hover:text-blue-400">الأسئلة الشائعة</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="mb-4 text-lg font-semibold">تواصل معنا</h3>
-                <ul className="space-y-2">
-                  <li>البريد الإلكتروني: support@example.com</li>
-                  <li>الهاتف: +966 55 555 5555</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="mb-4 text-lg font-semibold">تابعنا</h3>
-                <div className="flex space-x-4">
-                  {/* Add social media icons/links here */}
-                </div>
-              </div>
-            </div>
-            <div className="pt-8 mt-8 text-center border-t border-gray-700">
-              <p>&copy; {new Date().getFullYear()} جميع الحقوق محفوظة</p>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </DashboardLayout>
-  );
-};
-
-export { Phone, FileText };
-export default PlayerProfilePage;
