@@ -276,6 +276,33 @@ interface PlayerState extends PlayerData {
   additional_image_urls?: string[];
 }
 
+// Helper function to format date values
+const formatDate = (dateValue: Date | string | { toDate: () => Date } | null | undefined): string => {
+  if (!dateValue) return '';
+  
+  try {
+    // Handle Firestore Timestamp
+    if (dateValue && typeof dateValue === 'object' && 'toDate' in dateValue) {
+      return dateValue.toDate().toISOString().split('T')[0];
+    }
+    
+    // Handle string date
+    if (typeof dateValue === 'string') {
+      return new Date(dateValue).toISOString().split('T')[0];
+    }
+    
+    // Handle Date object
+    if (dateValue instanceof Date) {
+      return dateValue.toISOString().split('T')[0];
+    }
+    
+    return '';
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
+};
+
 export default function PlayerProfile() {
   const router = useRouter();
   const [user, loading, error] = useAuthState(auth);
