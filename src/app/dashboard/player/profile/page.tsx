@@ -293,10 +293,11 @@ export default function PlayerProfile() {
         console.log("Player data from Firestore:", data);
         
         // Helper function to format date
-        const formatDate = (dateValue) => {
+        type DateValue = Date | string | { toDate: () => Date } | null | undefined;
+        const formatDate = (dateValue: DateValue): string => {
           if (!dateValue) return '';
           try {
-            if (dateValue && typeof dateValue.toDate === 'function') {
+            if (dateValue && typeof dateValue === 'object' && 'toDate' in dateValue) {
               return dateValue.toDate().toISOString().split('T')[0];
             }
             if (typeof dateValue === 'string') {
