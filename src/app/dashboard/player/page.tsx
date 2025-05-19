@@ -3,15 +3,24 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { 
-<<<<<<< HEAD
-  AlertCircle, Award, Badge, BookOpen 
-=======
-  AlertCircle, Award, Badge, BookOpen,
-  Eye, Mail, Heart, UserCheck, BarChart,
-  User, Activity, MessageSquare, FileText,
-  Zap, Brain, Target, Settings, LogOut,
-  Search, Bell, Video
->>>>>>> e95bc34 (Initial commit)
+  AlertCircle, 
+  Award, 
+  Badge, 
+  BookOpen,
+  Eye, 
+  Mail, 
+  Heart, 
+  UserCheck, 
+  BarChart,
+  User, 
+  Activity, 
+  MessageSquare, 
+  FileText,
+  Zap, 
+  Brain, 
+  Target, 
+  Settings, 
+  LogOut
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -32,10 +41,6 @@ function WelcomePopup({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
       <div className="w-full max-w-2xl p-8 bg-white rounded-2xl animate-fade-in">
         <Image src="/hagzz-logo.png" alt="HAGZZ GO" width={80} height={80} className="h-20 mx-auto mb-6" />
-<<<<<<< HEAD
-        <Image src="/hagzz-logo.png" alt="HAGZZ GO" className="h-20 mx-auto mb-6" />
-=======
->>>>>>> e95bc34 (Initial commit)
         <h2 className="mb-4 text-2xl font-bold">🎉 مرحبًا بك في HAGZZ GO</h2>
         <p className="mb-8 leading-relaxed text-gray-600">
           لنبدأ رحلتك نحو الاحتراف. قم بتخصيص ملفك الشخصي الآن واحصل على أفضل الفرص في عالم كرة القدم!
@@ -307,11 +312,8 @@ export default function PlayerDashboard() {
             <Image
               src="/player-avatar.jpg"
               alt="صورة اللاعب"
-<<<<<<< HEAD
-=======
               width={128}
               height={128}
->>>>>>> e95bc34 (Initial commit)
               className="object-cover w-full h-full border-4 border-white rounded-full shadow-lg"
             />
             <span className="absolute bottom-0 left-0 w-4 h-4 bg-green-400 border-2 border-white rounded-full"></span>
@@ -322,11 +324,7 @@ export default function PlayerDashboard() {
 
         <nav className="p-4 space-y-2">
         {[
-<<<<<<< HEAD
-          { icon: ChartBar, label: 'النظرة العامة', value: 'overview', link: '/dashboard/player' },
-=======
           { icon: BarChart, label: 'النظرة العامة', value: 'overview', link: '/dashboard/player' },
->>>>>>> e95bc34 (Initial commit)
           { icon: User, label: 'الملف الشخصي', value: 'profile', link: '/dashboard/player/profile' },
           { icon: Activity, label: 'الإحصائيات', value: 'stats', link: '/dashboard/player/stats' },
           { icon: MessageSquare, label: 'الرسائل', value: 'messages', link: '/dashboard/player/messages' },
@@ -548,9 +546,6 @@ export default function PlayerDashboard() {
         <div className="container px-8 py-6 mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-<<<<<<< HEAD
-              <Image src="/hagzz-logo.png" alt="HAGZZ GO" className="h-8" />
-=======
               <Image 
                 src="/hagzz-logo.png" 
                 alt="HAGZZ GO" 
@@ -558,7 +553,6 @@ export default function PlayerDashboard() {
                 height={32}
                 className="h-8" 
               />
->>>>>>> e95bc34 (Initial commit)
               <p className="text-sm text-gray-600">
                 © 2024 HAGZZ GO جميع الحقوق محفوظة
               </p>
