@@ -1616,7 +1616,7 @@ const uploadWalletDocument = async (
       </div>
     </DashboardLayout>
   );
-}
+};
 
 // Add type definitions at the top
 interface IconProps extends React.SVGProps<SVGSVGElement> {
