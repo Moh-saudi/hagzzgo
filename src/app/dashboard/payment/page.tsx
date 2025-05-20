@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/lib/firebase/config';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { createClient } from '@supabase/supabase-js'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Link from 'next/link';
 import Image from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -20,6 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { X } from 'lucide-react';
+
 
 // أنواع البيانات
 interface PackageType {
@@ -56,14 +57,10 @@ const PACKAGES: Record<string, PackageType> = {
   // ...other packages
 };
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-export const supabase = createClient(supabaseUrl, supabaseKey)
-
 export default function PaymentPage() {
   const router = useRouter();
   const [user, loading] = useAuthState(auth);
+  const supabase = createClientComponentClient();
   const [selectedPackage, setSelectedPackage] = useState<string>('3months');
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [transactionNumber, setTransactionNumber] = useState<string>('');
@@ -82,8 +79,10 @@ export default function PaymentPage() {
   // معالجة رفع الإيصال
   const handleReceiptUpload = async (file: File): Promise<string> => {
     try {
+      if (!user) throw new Error('User not authenticated');
+      
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user?.uid}-${Date.now()}.${fileExt}`;
+      const fileName = `${user.uid}-${Date.now()}.${fileExt}`;
       const filePath = `receipts/${fileName}`;
 
       const { error: uploadError, data } = await supabase.storage

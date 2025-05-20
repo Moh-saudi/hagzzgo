@@ -7,7 +7,9 @@ const nextConfig = {
   images: {
     domains: [
       'ekyerljzfokqimbabzxm.supabase.co',
-      'firebasestorage.googleapis.com'
+      'firebasestorage.googleapis.com',
+      'localhost',
+      process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('https://', '') || '',
     ],
   },
   env: {
