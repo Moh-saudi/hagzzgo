@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '@/lib/firebase/config';
@@ -20,7 +20,7 @@ interface SubscriptionStatus {
   autoRenew: boolean;
 }
 
-export default function SubscriptionStatusPage() {
+function SubscriptionStatusContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [user] = useAuthState(auth);
@@ -257,5 +257,20 @@ export default function SubscriptionStatusPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SubscriptionStatusPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+          <p className="mt-4 text-gray-600">جاري تحميل البيانات...</p>
+        </div>
+      </div>
+    }>
+      <SubscriptionStatusContent />
+    </Suspense>
   );
 }

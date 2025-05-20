@@ -177,19 +177,23 @@ const initSupabase = () => {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Missing Supabase environment variables');
+    console.warn('Missing Supabase environment variables');
+    return null;
   }
 
   return createClient(supabaseUrl, supabaseKey);
 };
 
-const supabase = initSupabase();
-
 export default function PlayerProfile() {
   console.log('PlayerProfile: component start');
   const router = useRouter();
   const [user, loading, error] = useAuthState(auth);
-  console.log('PlayerProfile: auth state', { user, loading, error });
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const client = initSupabase();
+    setSupabase(client);
+  }, []);
 
   const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL);
   const [submitting, setSubmitting] = useState(false);

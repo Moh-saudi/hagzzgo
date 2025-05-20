@@ -60,10 +60,7 @@ const PACKAGES: Record<string, PackageType> = {
 export default function PaymentPage() {
   const router = useRouter();
   const [user, loading] = useAuthState(auth);
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const [supabase, setSupabase] = useState<any>(null);
   const [selectedPackage, setSelectedPackage] = useState<string>('3months');
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [transactionNumber, setTransactionNumber] = useState<string>('');
@@ -71,6 +68,19 @@ export default function PaymentPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<boolean>(false);
+
+  useEffect(() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase environment variables');
+      return;
+    }
+
+    const client = createBrowserClient(supabaseUrl, supabaseKey);
+    setSupabase(client);
+  }, []);
 
   // التحقق من تسجيل الدخول
   useEffect(() => {
