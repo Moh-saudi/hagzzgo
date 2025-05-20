@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '@/lib/firebase/config';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createBrowserClient } from '@supabase/ssr'
 import Link from 'next/link';
 import Image from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -60,7 +60,10 @@ const PACKAGES: Record<string, PackageType> = {
 export default function PaymentPage() {
   const router = useRouter();
   const [user, loading] = useAuthState(auth);
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const [selectedPackage, setSelectedPackage] = useState<string>('3months');
   const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [transactionNumber, setTransactionNumber] = useState<string>('');

@@ -26,7 +26,8 @@ export const formatDate = (date: Date) => {
 // إضافة دالة رفع الملفات باستخدام Supabase
 export const uploadFileToStorage = async (file: File, bucket: string) => {
   try {
-    const { supabase } = await import('@/lib/supabase/config')
+    const { getSupabaseClient } = await import('@/lib/supabase/config')
+    const supabase = getSupabaseClient();
     const fileExt = file.name.split('.').pop()
     const fileName = `${Math.random()}.${fileExt}`
 
