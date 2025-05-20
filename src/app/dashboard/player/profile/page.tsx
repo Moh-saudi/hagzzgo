@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 // Loading Spinner Component
 const LoadingSpinner: React.FC = () => (
@@ -181,7 +182,16 @@ const initSupabase = () => {
     return null;
   }
 
-  return createClient(supabaseUrl, supabaseKey);
+  try {
+    return createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        persistSession: false
+      }
+    });
+  } catch (error) {
+    console.error('Error initializing Supabase client:', error);
+    return null;
+  }
 };
 
 export default function PlayerProfile() {
@@ -734,8 +744,12 @@ export default function PlayerProfile() {
    * معالج رفع الصور إلى Supabase
    */
   const handleImageUpload = async (file: File, bucket: string, path: string) => {
+    if (!supabase) {
+      throw new Error('Supabase client not initialized');
+    }
+
     try {
-      // التحقق من الملف
+      // Validate file
       if (file.size > 5 * 1024 * 1024) {
         throw new Error('حجم الملف يجب أن يكون أقل من 5 ميجابايت');
       }
@@ -744,7 +758,8 @@ export default function PlayerProfile() {
         throw new Error('يجب أن يكون الملف صورة');
       }
 
-      const { error: uploadError } = await supabase.storage
+      // Upload file
+      const { error: uploadError, data } = await supabase.storage
         .from(bucket)
         .upload(path, file, {
           cacheControl: '3600',
@@ -753,6 +768,7 @@ export default function PlayerProfile() {
 
       if (uploadError) throw uploadError;
 
+      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from(bucket)
         .getPublicUrl(path);
@@ -856,12 +872,30 @@ export default function PlayerProfile() {
             />
             {uploadingProfileImage && <span className="text-blue-600">جاري الرفع...</span>}
             {editFormData.profile_image?.url && (
-              <img src={editFormData.profile_image.url} alt="Profile" className="object-cover w-24 h-24 rounded-full" />
+              <div className="relative w-24 h-24">
+                <Image
+                  src={editFormData.profile_image.url}
+                  alt="Profile"
+                  fill
+                  className="object-cover rounded-full"
+                  sizes="96px"
+                  priority
+                />
+              </div>
             )}
           </div>
         ) : (
           formData.profile_image?.url ? (
-            <img src={formData.profile_image.url} alt="Profile" className="object-cover w-24 h-24 rounded-full" />
+            <div className="relative w-24 h-24">
+              <Image
+                src={formData.profile_image.url}
+                alt="Profile"
+                fill
+                className="object-cover rounded-full"
+                sizes="96px"
+                priority
+              />
+            </div>
           ) : (
             <span className="text-gray-400">لا توجد صورة شخصية</span>
           )
