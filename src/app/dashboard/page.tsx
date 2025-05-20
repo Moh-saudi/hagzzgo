@@ -6,6 +6,7 @@ import { db, auth } from '@/lib/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
+
 export default function DashboardRedirectPage() {
   const router = useRouter();
 
