@@ -30,7 +30,8 @@ export function isSupabaseAvailable() {
 export const STORAGE_BUCKETS = {
   AVATARS: 'avatars',
   PLAYER_IMAGES: 'player-images',
-  DOCUMENTS: 'documents'
+  DOCUMENTS: 'documents',
+  PAYMENT_RECEIPTS: 'payment-receipts'
 } as const;
 
 // وظائف مساعدة للتعامل مع التخزين
