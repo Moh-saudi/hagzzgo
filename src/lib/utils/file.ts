@@ -1,6 +1,13 @@
 // src/lib/utils/file.ts
 
-import { supabase } from '@/lib/supabase/config';
+import { createClient } from '@supabase/supabase-js';
+
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+// تعريف أنواع الملفات المسموح بها وحجمها الأقصى
 
 export const allowedFileTypes = {
   images: ['image/jpeg', 'image/png', 'image/webp'],
